@@ -57,8 +57,8 @@ const Item items[]=
 
 /*                    STATUS                    */
 
-/*18*/    {14, "Working", "changeSettingsStatus", "1"},
-/*19*/    {14, "Stopped", "changeSettingsStatus"},
+/*18*/    {14, "Working", "setSingleOption", "1"},
+/*19*/    {14, "Stopped", "setSingleOption"},
 /*20*/    {14, "Back", "back"},
 
 /*                    UNITS                     */

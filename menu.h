@@ -198,6 +198,9 @@ public:
         strcat(buf,placeholder);
         s.replace(buf, items[i].value);
     }
+    
+    if(s.length() == 0) s = CONFIG_MENU_EMPTY;
+    
     for(byte j=0;j < CONFIG_MENU_WIDTH; j++)
       dest[j] = s[j];      
   }
@@ -223,12 +226,13 @@ public:
   {
     if(input.action == "menu.changeSelectionDown")
     {
-        input.action = "";
-        this->changeSelection(1);
         
-        output.clearScreen();
-        
-        this->listChildren(this->current_menu_id);
+      input.action = "";
+      this->changeSelection(1);
+      
+      output.clearScreen();
+      
+      this->listChildren(this->current_menu_id);
     }
     
     if(input.action == "menu.changeSelectionUp")
@@ -265,16 +269,17 @@ public:
           output.clearScreen();
           
           this->listChildren(this->current_menu_id);        
-        }/*
-        else if(strcmp(items[this->active_menu_id].function, "changeSettingsStatus") == 0)
-        {            
-           my_config.single_selection_settings[0] = this->active_menu_id;
+        }
+        else if(strcmp(items[this->active_menu_id].function, "setSingleOption") == 0)
+        {       
+          Serial.println(   this->active_menu_id);  
+           /*my_config.single_selection_settings[0] = this->active_menu_id;
           this->configSave();
           
           output.clearScreen();
           
-          this->listChildren(this->current_menu_id);        
-        }
+          this->listChildren(this->current_menu_id);        */
+        }/*
         else if(strcmp(items[this->active_menu_id].function, "changeSettingsUnits") == 0)
         {            
            my_config.single_selection_settings[1] = this->active_menu_id;
