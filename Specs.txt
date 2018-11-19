@@ -1,7 +1,7 @@
 We want to create a menu library that will be easy to use in arduino. The main purpose is to have a menu that you can navigate using your buttons and to display its contents on your display.
 There will be a separate file where you configure your menu. The menu is divided into pages.
 
-Each page is a set of lines that you display.
+Each page is a set of lines that you display..
 
 Each line is divided into tags and each tag has a set of parameters.
 
