@@ -1,0 +1,265 @@
+We want to create a menu library that will be easy to use in arduino. The main purpose is to have a menu that you can navigate using your buttons and to display its contents on your display.
+There will be a separate file where you configure your menu. The menu is divided into pages.
+
+Each page is a set of lines that you display.
+
+Each line is divided into tags and each tag has a set of parameters.
+
+
+Special Actions (Enter, Escape, Erase, MoveUp, MoveDown, MoveLeft, MoveRight, Fn)
+
+const int pages = 3;
+
+{
+    setup:
+    {
+        refresh:
+        {
+            on_time:0,
+            on_value_change:true,
+            on_input_trigger:[0,1]
+        },
+        buttons:
+        {
+            click:300,                      
+            confirmation: 1,                
+            homing: 60
+        },
+        defaults:
+        {
+            tags:
+            {
+                normal:
+                {
+                    font: "Arial",
+                    size: 10,
+                    color: 0x0000,
+                    background: 0xFFFF,
+                    style: "flat",
+                    align: "right"
+                },
+                selected:
+                {
+                    font: "Arial",
+                    size: 10,
+                    color: 0xFFFF,
+                    background: 0x0000,
+                    style: "flat",
+                    align: "right"
+                }
+            }
+        }
+    },
+    buttons:
+    [
+        {
+            pin:10,                 
+            numbers:[0],            
+            letters:["a","b","c"],        
+            special:[],
+            fn:[]
+        },
+        {
+            pin:11,
+            numbers:[1],
+            letters:["d","e","f"],
+            special:[],
+            fn:[]
+        },
+        {
+            pin:12,
+            numbers:[],
+            letters:[],
+            special:["up"],
+            fn:[]
+        },
+        {
+            pin:13,
+            numbers:[],
+            letters:[],
+            special:["down"],
+            fn:[]
+        },
+        {
+            pin:14,
+            numbers:[],
+            letters:[],
+            special:["enter"],
+            fn:[]
+        },
+        {
+            pin:15,
+            numbers:[],
+            letters:[],
+            special:["fn"],
+            fn:[]
+        }
+    ],
+    menus:
+    [
+        {
+            id:"home",
+            lines:
+            [
+                {
+                    style: flat,
+                    height: 4,
+                    tags:
+                    [
+                        {
+                            length:7,
+                            from_var:"temperature",
+                            type:"writable",
+                            normal:
+                            {
+                                font: "Arial",
+                                size: 10,
+                                color: 0x0000,
+                                background: 0xFFFF,
+                                style: "flat",
+                                align: "right"
+                            },
+                            selected:
+                            {
+                                font: "Arial",  
+                                size: 10,
+                                color: 0xFFFF,
+                                background: 0x0000,
+                                style: "flat",
+                                align: "right"
+                            },
+                            text:""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            id:"temperature",
+            lines:
+            [
+
+            ]
+
+            
+        }
+    ]
+}
+
+menu(array)
+[
+    pages(array)
+    [
+        id(char 8),
+        lines(array)
+        [
+            style(array[flat, square outline, round outline]),
+            height(integer 0 - 1000),
+            tags(array)
+            [
+                char_num,
+                from_var,
+                type(array[readonly,writable]),
+                normal(array
+                [
+                    ftype(array[font1,font2...]),
+                    fsize(integer 1..128),
+                    fcolor(0x0000),
+                    fbackground(0x0000),
+                    style(array[flat, square outline, round outline]),
+                    align(array[left,right])
+                ]),
+                selected(array
+                [
+                    ftype(array[font1,font2...]),
+                    fsize(integer 1..128),
+                    fcolor(0x0000),
+                    fbackground(0x0000),
+                    style(array[flat, square outline, round outline]),
+                    align(array[left,right])
+                ]),
+                action(array[change page,change value,run script])
+            ]
+        ]
+    ]
+]
+
+Menu global configuration:
+    Define buttons
+        Button 0:
+            numbers: 0
+            letters: (space)
+            special actions: 
+            fn trigger: toggleRelay0();
+
+        Button 1:
+            numbers: 1
+            letters: a,b,c,A,B,C
+            special actions: 
+            fn trigger: 
+        ....
+
+        Button 9:
+            numbers: 
+            letters: 
+            special actions: Enter
+            fn trigger: 
+
+        Button 10:
+            numbers: 
+            letters:
+            special actions: Up
+            fn trigger: 
+
+        Button 11:
+            numbers:
+            letters:
+            special actions: Down
+            fn trigger: 
+            
+        Button 12:
+            numbers:
+            letters:
+            special actions: Fn
+            fn trigger: 
+
+    Define behavior
+        Button press time: 300ms
+        Typing delay: 2s
+        Enable Home action: 0(no), 1-1000s - this setting will take the menu to the home screen after x seconds of inactivity
+
+
+
+
+
+Menu pages:
+    Page 1:
+        Page ID
+        [Define page lines]
+            Line 1:
+                Height
+                Style (flat, square outline, round outline)
+                [Define line tags:]
+                    Tag 1:
+                        Number of characters
+                        Value from variable
+                        Type                            
+                            Read-only, Writable
+
+                        Normal style
+                            Font type
+                            Font size
+                            Font color
+                            Font background
+                            Tag style(flat, square outline, round outline)
+                            Text align
+                        Selected style
+                            Font type
+                            Font size
+                            Font color
+                            Font background
+                            Tag style(flat, square outline, round outline)
+                            Text align
+
+
+        
