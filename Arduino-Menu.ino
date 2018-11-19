@@ -45,14 +45,6 @@ void setup() {
   
   menu.configLoad();
   //menu.configSaveDefault();
-  //globals.saveConfig();
-  //globals.loadConfig();
-/*
-  for(int i=0;i<sizeof target_points / sizeof target_points[0];i++)
-  {
-    output.println(target_points[i].title);
-  }
-*/
 
   menu.setCurrentMenuId(0);
   menu.setSelectedMenuId(0);
@@ -61,16 +53,9 @@ void setup() {
 
 void loop() {
 
- // temperature = random(100);
-  //sprintf(items[2].title,"%s %i","Temperature:",temperature);
 
-  //items[2].title[sizeof(items[2].title)] = '\0';
-  
-  //menu.changeSelection(1);
-  //menu.listChildren(menu.current_menu_id);
-/*
   input.listen();
   menu.menuAnswer();
-*/
+
   delay(100);
 }

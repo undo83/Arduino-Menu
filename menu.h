@@ -181,51 +181,25 @@ public:
 
   void parseTitle(char title[CONFIG_MENU_WIDTH])
   {
-    //output.str_replace(title,"om","neom");    
-    for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
-      dest[i] = title[i];
-    /*
+    String s;
     char buf[CONFIG_MENU_WIDTH];
-    const char *first = "%tpname";
-    const char second[16];
-    const char *third = "%";
+    const char *placeholder = "%";
+    const char value[16];
     
-    for(byte i=0;i < CONFIG_MENU_WIDTH; i++)
-      dest[i] = title[i];
-
-    for(byte i = 0; i< sizeof my_config.tp / sizeof my_config.tp[0]; i++)
+    s = String(title);
+        
+    for(byte i=0;i<sizeof items/sizeof items[0];i++)
     {
-      buf[0] = 0;
-      itoa(i, second, 10);
-      strcpy(buf,first);
-      strcat(buf,second);
-      strcat(buf,third);
-      if(strcmp(title, buf) == 0)
-        for(byte j=0;j<CONFIG_MENU_WIDTH;j++)
-          dest[j] = my_config.tp[i].title[j];
-    }  
-    
-    if(strcmp(dest, "%tpname0%") == 0)
-      for(byte i=0;i < CONFIG_MENU_WIDTH; i++)
-        dest[i] = my_config.tp[0].title[i];
-    else if(strcmp(title, "%tpname1%") == 0)
-      for(byte i=0;i < CONFIG_MENU_WIDTH; i++)
-        dest[i] = my_config.tp[1].title[i];
-    else if(strcmp(title, "%tpname2%") == 0)
-    for(byte i=0;i < CONFIG_MENU_WIDTH; i++)
-        dest[i] = my_config.tp[2].title[i];
-    else if(strcmp(title, "%tpname3%") == 0)
-    for(byte i=0;i < CONFIG_MENU_WIDTH; i++)
-        dest[i] = my_config.tp[3].title[i];
-    else if(strcmp(title, "%tpname4%") == 0)
-    for(byte i=0;i < CONFIG_MENU_WIDTH; i++)
-        dest[i] = my_config.tp[4].title[i];
-    else if(strcmp(title, "%tpname5%") == 0)
-    for(byte i=0;i < CONFIG_MENU_WIDTH; i++)
-        dest[i] = my_config.tp[5].title[i];
 
-    //destination = title;
-    */
+        buf[0] = 0;
+        itoa(i, value, 10);
+        strcpy(buf,placeholder);
+        strcat(buf,value);
+        strcat(buf,placeholder);
+        s.replace(buf, items[i].value);
+    }
+    for(byte j=0;j < CONFIG_MENU_WIDTH; j++)
+      dest[j] = s[j];      
   }
   
   void changeSelection(byte direction)
@@ -243,48 +217,8 @@ public:
       this->changeSelection(direction);
     }
   }
-  /*
-
-  byte returnPointsSize()
-  {
-    byte my_size = 0;
-    for(byte i=0;i< sizeof my_config.tp / sizeof my_config.tp[0]; i++)
-    {
-      //if(my_config.tp[i].duration > 0)
-        my_size++;
-    }
-    return my_size;
-  }
-  
-  
 
 
-
-
-  
-  void editRange(int min, int max, int &variable, byte direction)
-  {
-    
-    String s;
-    
-    variable=variable + direction;
-    
-    if(variable<min) variable = min;
-    if(variable>max) variable = max;
-    
-    output.println(variable);
-    s = "[";
-    for(int i=0;i<my_setup.line_length-2;i++)
-    {
-      if(i<floor((my_setup.line_length-2)*variable/(max-min)))
-        s+="-";
-      else
-        s+=" ";
-    }
-    s+="]";
-    Serial.println(s);
-    
-  }
   void menuAnswer()
   {
     if(input.action == "menu.changeSelectionDown")
@@ -331,7 +265,7 @@ public:
           output.clearScreen();
           
           this->listChildren(this->current_menu_id);        
-        }
+        }/*
         else if(strcmp(items[this->active_menu_id].function, "changeSettingsStatus") == 0)
         {            
            my_config.single_selection_settings[0] = this->active_menu_id;
@@ -391,9 +325,9 @@ public:
           this->changeTPT();
           
         }
-        
+        */
     }
-    
+    /*
     if(input.action == "menu.editor.delete")
     {
       input.action = "";
@@ -466,7 +400,52 @@ public:
       
       this->changeAlphanumeric();
     }
+    */
   return;
+  }
+
+  
+  /*
+
+  byte returnPointsSize()
+  {
+    byte my_size = 0;
+    for(byte i=0;i< sizeof my_config.tp / sizeof my_config.tp[0]; i++)
+    {
+      //if(my_config.tp[i].duration > 0)
+        my_size++;
+    }
+    return my_size;
+  }
+  
+  
+
+
+
+
+  
+  void editRange(int min, int max, int &variable, byte direction)
+  {
+    
+    String s;
+    
+    variable=variable + direction;
+    
+    if(variable<min) variable = min;
+    if(variable>max) variable = max;
+    
+    output.println(variable);
+    s = "[";
+    for(int i=0;i<my_setup.line_length-2;i++)
+    {
+      if(i<floor((my_setup.line_length-2)*variable/(max-min)))
+        s+="-";
+      else
+        s+=" ";
+    }
+    s+="]";
+    Serial.println(s);
+    
   }
 
   void changeTPT()
