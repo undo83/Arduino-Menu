@@ -320,10 +320,10 @@ public:
           r = this->returnRangeParams(my_config[this->active_menu_id].value);
           
           
-          int f = atoi(my_config[this->current_menu_id].value)-r.step;
+          int f = atol(my_config[this->current_menu_id].value)-r.step;
           if(f >= r.value)
           {
-            itoa(f, my_config[this->current_menu_id].value, 10);
+            ltoa(f, my_config[this->current_menu_id].value, 10);
           }
 
           this->configSave();
@@ -338,10 +338,10 @@ public:
           r = this->returnRangeParams(my_config[this->active_menu_id].value);
           
           
-          int f = atoi(my_config[this->current_menu_id].value)+r.step;
+          int f = atol(my_config[this->current_menu_id].value)+r.step;
           if(f <= r.value)
           {
-            itoa(f, my_config[this->current_menu_id].value, 10);
+            ltoa(f, my_config[this->current_menu_id].value, 10);
           }
 
           this->configSave();
@@ -349,6 +349,24 @@ public:
           output.clearScreen();
           
           this->listChildren(this->current_menu_id);      
+        }
+        else if(strcmp(items[this->active_menu_id].function, "setAlphaNumeric") == 0)
+        {            
+          output.clearScreen();
+          this->parseTitle(my_config[this->active_menu_id].value);
+          for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
+           this->alphanumeric_buffer[i] = dest[i];
+           
+          this->changeAlphanumeric();    
+        }
+        else if(strcmp(items[this->active_menu_id].function, "setNumeric") == 0)
+        {            
+          output.clearScreen();
+          this->parseTitle(my_config[this->active_menu_id].value);
+          for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
+           this->alphanumeric_buffer[i] = my_config[this->active_menu_id].value[i];
+           
+          this->changeNumeric();    
         }/*
         else if(strcmp(items[this->active_menu_id].function, "changeSettingsCycleEnd") == 0)
         {            
@@ -393,7 +411,7 @@ public:
         }
         */
     }
-    /*
+    
     if(input.action == "menu.editor.delete")
     {
       input.action = "";
@@ -445,11 +463,10 @@ public:
                  
           input_alphanumeric_position = 0; 
           this->alphanumeric_buffer[lastChar] = " ";
-          this->alphanumeric_buffer[lastChar+1] = 0;
+          this->alphanumeric_buffer[lastChar+1] = '\0';
         }
         
         input_pin = input.incomingByte;  
-        
         //alphanumeric
         if(env==1)
         { 
@@ -466,10 +483,163 @@ public:
       
       this->changeAlphanumeric();
     }
-    */
+    
   return;
   }
 
+  
+  void changeAlphanumeric()
+  {
+    //env = 1;
+    
+    this->showTitle();
+
+    //this->alphanumeric_buffer = value;
+    
+    output.print(this->alphanumeric_buffer);
+    output.println(CONFIG_MENU_EDITOR_CURSOR);
+    
+    output.print(CONFIG_MENU_EDITOR_CONFIRM);
+    output.println(CONFIG_MENU_EDITOR_CANCEL);
+    
+    
+  }
+  void changeNumeric()
+  {
+    env = 2;
+    
+    this->showTitle();
+
+    //this->alphanumeric_buffer = value;
+    
+    output.print(this->alphanumeric_buffer);
+    output.println(CONFIG_MENU_EDITOR_CURSOR);
+    
+    output.print(CONFIG_MENU_EDITOR_CONFIRM);
+    output.println(CONFIG_MENU_EDITOR_CANCEL);
+  }
+  void saveAlphanumericBufferToMyConfig()
+  {
+    //my_config[this->active_menu_id].value[0] = '\0';
+    //for(byte j=0;j<CONFIG_MENU_WIDTH;j++)
+     // my_config[this->active_menu_id].value[j] = this->alphanumeric_buffer[j];
+    //this->my_config[this->active_menu_id].value =this->alphanumeric_buffer;
+    /*
+    char buf[CONFIG_MENU_WIDTH];
+    const char *first = "%tpname";
+    const char second[16];
+    const char *third = "%";
+    for(byte i = 0; i< sizeof my_config.tp / sizeof my_config.tp[0]; i++)
+    {
+      buf[0] = 0;
+      itoa(i, second, 10);
+      strcpy(buf,first);
+      strcat(buf,second);
+      strcat(buf,third);
+      if(strcmp(items[items[this->active_menu_id].parent_id].title, buf) == 0)
+      {
+      }
+    }
+    
+    this->alphanumeric_buffer[0] = 0;
+    */
+    
+        switch(env)
+        {//title
+          case 1:
+            for(byte j=0;j<strlen(this->alphanumeric_buffer);j++)
+              my_config[this->active_menu_id].value[j] = this->alphanumeric_buffer[j];
+              
+            my_config[this->active_menu_id].value[strlen(this->alphanumeric_buffer)] = '\0';
+          break;
+
+          case 2:
+            for(byte j=0;j<strlen(this->alphanumeric_buffer);j++)
+              my_config[this->active_menu_id].value[j] = this->alphanumeric_buffer[j];
+             my_config[this->active_menu_id].value[strlen(this->alphanumeric_buffer)] = '\0';
+          break;
+
+          case 3:
+             //my_config.tp[i].rh = atoi(this->alphanumeric_buffer);
+          break;
+
+          case 4:
+             //my_config.tp[i].duration = atoi(this->alphanumeric_buffer);
+          break;
+        }
+        this->alphanumeric_buffer[0] = 0;
+  }
+  void typeNextAlphanumericCharacter()
+  {
+    
+    byte lastChar = strlen(this->alphanumeric_buffer);
+    
+    if(lastChar < CONFIG_MENU_WIDTH)
+    {
+        
+      //find the used input
+      for(byte i=0; i< sizeof inputs / sizeof inputs[0]; i++)
+      {
+        if(inputs[i].pin == input_pin)
+        {
+          if(input_alphanumeric_position >= strlen(inputs[i].alphanumeric))
+            input_alphanumeric_position = 0;
+
+          this->alphanumeric_buffer[lastChar-1] = inputs[i].alphanumeric[input_alphanumeric_position];        
+          this->alphanumeric_buffer[lastChar] = 0;
+              
+          input_alphanumeric_position++;
+        }
+      }
+    }
+  }
+  void typeNextNumericCharacter()
+  {
+    
+    byte lastChar = strlen(this->alphanumeric_buffer);
+    
+    if(lastChar < CONFIG_MENU_WIDTH)
+    {
+      //Serial.println(input_alphanumeric_position);
+        
+      //find the used input
+      for(byte i=0; i< sizeof inputs / sizeof inputs[0]; i++)
+      {
+        if(inputs[i].pin == input_pin)
+        {
+          
+         // (atoi(inputs[i].alphanumeric[input_alphanumeric_position])>0
+          //if there are no numeric values inside, return;
+          bool numeric_values = false;
+          for(byte j=0;j < strlen(inputs[i].alphanumeric);j++)
+          {
+            if(atoi(inputs[i].alphanumeric[j]) > 0 || inputs[i].alphanumeric[j] == '0')
+              numeric_values = true;
+          }
+
+          if(!numeric_values) 
+            return;
+            
+          if(input_alphanumeric_position >= strlen(inputs[i].alphanumeric))
+            input_alphanumeric_position = 0;
+
+          if(atoi(inputs[i].alphanumeric[input_alphanumeric_position])==0)
+          {
+            input_alphanumeric_position++;
+            this->typeNextNumericCharacter();
+          }
+          else
+          {
+              this->alphanumeric_buffer[lastChar-1] = inputs[i].alphanumeric[input_alphanumeric_position];        
+              this->alphanumeric_buffer[lastChar] = '\0';
+          }
+          
+              
+          
+        }
+      }
+    }
+  }
   
   /*
 
@@ -582,104 +752,7 @@ public:
       }
     }
   }
-  void changeNumeric()
-  {
-    env = 2;
-    
-    this->showTitle();
-
-    //this->alphanumeric_buffer = value;
-    
-    output.print(this->alphanumeric_buffer);
-    output.println(CONFIG_MENU_EDITOR_CURSOR);
-    
-    output.print(CONFIG_MENU_EDITOR_CONFIRM);
-    output.println(CONFIG_MENU_EDITOR_CANCEL);
-  }
   
-  void typeNextNumericCharacter()
-  {
-    
-    byte lastChar = strlen(this->alphanumeric_buffer);
-    
-    if(lastChar < CONFIG_MENU_WIDTH)
-    {
-        
-      //find the used input
-      for(byte i=0; i< sizeof inputs / sizeof inputs[0]; i++)
-      {
-        if(inputs[i].pin == input_pin)
-        {
-          //if there are no numeric values inside, return;
-          bool numeric_values = false;
-          for(byte j=0;j < strlen(inputs[i].alphanumeric);j++)
-          {
-            if(atoi(inputs[i].alphanumeric[j]) > 0 || inputs[i].alphanumeric[j] == '0')
-              numeric_values = true;
-          }
-
-          if(!numeric_values) 
-            return;
-            
-          if(input_alphanumeric_position >= strlen(inputs[i].alphanumeric))
-            input_alphanumeric_position = 0;
-
-          if(atoi(inputs[i].alphanumeric[input_alphanumeric_position])==0)
-          {
-            input_alphanumeric_position++;
-            this->typeNextNumericCharacter();
-          }
-          else
-          {
-              this->alphanumeric_buffer[lastChar-1] = inputs[i].alphanumeric[input_alphanumeric_position];        
-              this->alphanumeric_buffer[lastChar] = 0;
-          }
-          
-              
-          
-        }
-      }
-    }
-  }
-  void saveAlphanumericBufferToMyConfig()
-  {
-    char buf[CONFIG_MENU_WIDTH];
-    const char *first = "%tpname";
-    const char second[16];
-    const char *third = "%";
-    for(byte i = 0; i< sizeof my_config.tp / sizeof my_config.tp[0]; i++)
-    {
-      buf[0] = 0;
-      itoa(i, second, 10);
-      strcpy(buf,first);
-      strcat(buf,second);
-      strcat(buf,third);
-      if(strcmp(items[items[this->active_menu_id].parent_id].title, buf) == 0)
-      {
-        switch(env)
-        {//title
-          case 1:
-            for(byte j=0;j<CONFIG_MENU_WIDTH;j++)
-             // my_config.tp[i].title[j] = this->alphanumeric_buffer[j];
-          break;
-
-          case 2:
-             //my_config.tp[i].temperature = atoi(this->alphanumeric_buffer);
-          break;
-
-          case 3:
-             //my_config.tp[i].rh = atoi(this->alphanumeric_buffer);
-          break;
-
-          case 4:
-             //my_config.tp[i].duration = atoi(this->alphanumeric_buffer);
-          break;
-        }
-      }
-    }
-    
-    this->alphanumeric_buffer[0] = 0;
-  }
   
 */
 

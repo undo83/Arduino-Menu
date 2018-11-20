@@ -115,6 +115,7 @@ const Item items[]=
 /*57*/    {8, "Humidity: %57%%", "listItems"},
 /*58*/    {8, "Set duration", "setNumeric"},
 /*59*/    {8, "Back", "back"},
+
 /*                      TARGET POINT 5           */
 /*60*/    {9, "Set name", "changeTPName"},
 /*61*/    {9, "Temperature: %61%ºC", "listItems"},
