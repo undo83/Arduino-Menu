@@ -62,70 +62,120 @@ const Item items[]=
 /*20*/    {14, "Back", "back"},
 
 /*                    UNITS                     */
-/*21*/    {15, "Celsius", "changeSettingsUnits", "1"},
-/*22*/    {15, "Fahrenheit", "changeSettingsUnits"},
+/*21*/    {15, "Celsius", "setSingleOption", "1"},
+/*22*/    {15, "Fahrenheit", "setSingleOption"},
 /*23*/    {15, "Back", "back"},
 
 /*                    CYCLE END                     */
-/*24*/    {16, "Stop", "changeSettingsCycleEnd"},
-/*25*/    {16, "Keep last params", "changeSettingsCycleEnd", "1"},
-/*26*/    {16, "Restart", "changeSettingsCycleEnd"},
+/*24*/    {16, "Stop", "setSingleOption"},
+/*25*/    {16, "Keep last params", "setSingleOption", "1"},
+/*26*/    {16, "Restart", "setSingleOption"},
 /*27*/    {16, "Back", "back"},
 
 /*                     START FROM TARGET         */
-/*28*/    {12, "%35%", "changeCycleStartFrom"},
-/*29*/    {12, "%40%", "changeCycleStartFrom"},
-/*30*/    {12, "%45%", "changeCycleStartFrom"},
-/*31*/    {12, "%50%", "changeCycleStartFrom"},
-/*32*/    {12, "%55%", "changeCycleStartFrom"},
-/*33*/    {12, "%60%", "changeCycleStartFrom"},
+/*28*/    {12, "%35%", "setSingleOption", "1"},
+/*29*/    {12, "%40%", "setSingleOption"},
+/*30*/    {12, "%45%", "setSingleOption"},
+/*31*/    {12, "%50%", "setSingleOption"},
+/*32*/    {12, "%55%", "setSingleOption"},
+/*33*/    {12, "%60%", "setSingleOption"},
 /*34*/    {12, "Back", "back"},
 
 /*                      TARGET POINT 0           */
-/*35*/    {4, "Set name", "changeTPName", "Fermentation"},
-/*36*/    {4, "Set temperature", "changeTPT0", "22"},
-/*37*/    {4, "Set RH", "editTPRH", "75"},
-/*38*/    {4, "Set duration", "editTPDuration", "100"},
+/*35*/    {4, "Set name", "setAlphaNumeric", "Fermentation"},
+/*36*/    {4, "Temperature: %36%ºC", "listItems", "22"},
+/*37*/    {4, "Humidity: %37%%", "listItems", "75"},
+/*38*/    {4, "Set duration", "setNumeric", "100"},
 /*39*/    {4, "Back", "back"},
 
 /*                      TARGET POINT 1           */
 /*40*/    {5, "Set name", "changeTPName", "Curing 1"},
-/*41*/    {5, "Set temperature", "changeTPT2", "13"},
-/*42*/    {5, "Set RH", "editTPRH", "80"},
-/*43*/    {5, "Set duration", "editTPDuration", "40"},
+/*41*/    {5, "Temperature: %41%ºC", "listItems", "13"},
+/*42*/    {5, "Humidity: %42%%", "listItems", "80"},
+/*43*/    {5, "Set duration", "setNumeric", "40"},
 /*44*/    {5, "Back", "back"},
 
 /*                      TARGET POINT 2           */
 /*45*/    {6, "Set name", "changeTPName", "Curing 2"},
-/*46*/    {6, "Set temperature", "changeTPT", "12"},
-/*47*/    {6, "Set RH", "editTPRH", "75"},
-/*48*/    {6, "Set duration", "editTPDuration", "24"},
+/*46*/    {6, "Temperature: %46%ºC", "listItems", "12"},
+/*47*/    {6, "Humidity: %47%%", "listItems", "75"},
+/*48*/    {6, "Set duration", "setNumeric", "24"},
 /*49*/    {6, "Back", "back"},
 
 /*                      TARGET POINT 3           */
 /*50*/    {7, "Set name", "changeTPName"},
-/*51*/    {7, "Set temperature", "changeTPT"},
-/*52*/    {7, "Set RH", "editTPRH"},
-/*53*/    {7, "Set duration", "editTPDuration"},
+/*51*/    {7, "Temperature: %51%ºC", "listItems"},
+/*52*/    {7, "Humidity: %52%%", "listItems"},
+/*53*/    {7, "Set duration", "setNumeric"},
 /*54*/    {7, "Back", "back"},
 
 /*                      TARGET POINT 4           */
 /*55*/    {8, "Set name", "changeTPName"},
-/*56*/    {8, "Set temperature", "changeTPT"},
-/*57*/    {8, "Set RH", "editTPRH"},
-/*58*/    {8, "Set duration", "editTPDuration"},
+/*56*/    {8, "Temperature: %56%ºC", "listItems"},
+/*57*/    {8, "Humidity: %57%%", "listItems"},
+/*58*/    {8, "Set duration", "setNumeric"},
 /*59*/    {8, "Back", "back"},
 /*                      TARGET POINT 5           */
 /*60*/    {9, "Set name", "changeTPName"},
-/*61*/    {9, "Set temperature", "changeTPT"},
-/*62*/    {9, "Set RH", "editTPRH"},
-/*63*/    {9, "Set duration", "editTPDuration"},
+/*61*/    {9, "Temperature: %61%ºC", "listItems"},
+/*62*/    {9, "Humidity: %62%%", "listItems"},
+/*63*/    {9, "Set duration", "setNumeric"},
 /*64*/    {9, "Back", "back"},
 
+          {36, "-", "setRangeDown","v=0;s=1"},
+          {36, "+", "setRangeUp","v=40;s=1"},
+          {36, "Back", "back"},
 
+          {37, "-", "setRangeDown","v=0;s=1"},
+          {37, "+", "setRangeUp","v=100;s=1"},
+          {37, "Back", "back"},
+
+          {41, "-", "setRangeDown","v=0;s=1"},
+          {41, "+", "setRangeUp","v=40;s=1"},
+          {41, "Back", "back"},
+
+          {42, "-", "setRangeDown","v=0;s=1"},
+          {42, "+", "setRangeUp","v=100;s=1"},
+          {42, "Back", "back"},
+
+          {46, "-", "setRangeDown","v=0;s=1"},
+          {46, "+", "setRangeUp","v=40;s=1"},
+          {46, "Back", "back"},
+
+          {47, "-", "setRangeDown","v=0;s=1"},
+          {47, "+", "setRangeUp","v=100;s=1"},
+          {47, "Back", "back"},
+
+          {51, "-", "setRangeDown","v=0;s=1"},
+          {51, "+", "setRangeUp","v=40;s=1"},
+          {51, "Back", "back"},
+
+          {52, "-", "setRangeDown","v=0;s=1"},
+          {52, "+", "setRangeUp","v=100;s=1"},
+          {52, "Back", "back"},
+
+          {56, "-", "setRangeDown","v=0;s=1"},
+          {56, "+", "setRangeUp","v=40;s=1"},
+          {56, "Back", "back"},
+
+          {57, "-", "setRangeDown","v=0;s=1"},
+          {57, "+", "setRangeUp","v=100;s=1"},
+          {57, "Back", "back"},
+
+          {61, "-", "setRangeDown","v=0;s=1"},
+          {61, "+", "setRangeUp","v=40;s=1"},
+          {61, "Back", "back"},
+
+          {62, "-", "setRangeDown","v=0;s=1"},
+          {62, "+", "setRangeUp","v=100;s=1"},
+          {62, "Back", "back"},
+          
+//additional configuration parameters
+          {-2,"currentTime","","0"},
 
 };
-//const byte MENU_SIZE = sizeof items / sizeof items[0];
+
+
 
 
 

@@ -45,6 +45,8 @@ void setup() {
   
   menu.configLoad();
   //menu.configSaveDefault();
+  //my_config[18].value = 0;
+  //my_config[19].value = 1;
 
   menu.setCurrentMenuId(0);
   menu.setSelectedMenuId(0);

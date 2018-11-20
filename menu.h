@@ -52,6 +52,12 @@ public:
   
   Config my_config[sizeof items/sizeof items[0]];
 
+  //for now step and range can oly be integers.. I couldn't find a good way to convert float to char*
+  typedef struct{
+    int value;
+    int step;
+  } Range;
+
   void configLoad() {
     //populate my_config with whatever we find in eeprom
     this->configReturn();
@@ -271,24 +277,79 @@ public:
           this->listChildren(this->current_menu_id);        
         }
         else if(strcmp(items[this->active_menu_id].function, "setSingleOption") == 0)
-        {       
-          Serial.println(   this->active_menu_id);  
-           /*my_config.single_selection_settings[0] = this->active_menu_id;
-          this->configSave();
+        {                 
+          for(byte i=0; i< sizeof items/sizeof items[0];i++)
+          {
+            //all the options with the same parent_id get 0, the selected one gets 1
+            if(items[i].parent_id == items[this->active_menu_id].parent_id && i != this->active_menu_id)
+            {
+              my_config[i].value = 0;
+            }
+
+            if(i == this->active_menu_id)
+              my_config[i].value = "1";
+              
+          }
           
+          this->configSave();
+
+          this->current_menu_id = items[this->active_menu_id].parent_id;
+
           output.clearScreen();
           
-          this->listChildren(this->current_menu_id);        */
-        }/*
-        else if(strcmp(items[this->active_menu_id].function, "changeSettingsUnits") == 0)
-        {            
-           my_config.single_selection_settings[1] = this->active_menu_id;
-          this->configSave();
-          
-          output.clearScreen();
-          
-          this->listChildren(this->current_menu_id);        
+          this->listChildren(this->current_menu_id); 
         }
+        else if(strcmp(items[this->active_menu_id].function, "setMultipleOption") == 0)
+        {
+          if(my_config[this->active_menu_id].value == 0)
+            my_config[this->active_menu_id].value = "1";
+          else
+            my_config[this->active_menu_id].value = 0;
+          
+          this->configSave();
+
+          this->current_menu_id = items[this->active_menu_id].parent_id;
+
+          output.clearScreen();
+          
+          this->listChildren(this->current_menu_id); 
+        }
+        else if(strcmp(items[this->active_menu_id].function, "setRangeDown") == 0)
+        {
+          Range r;
+          r = this->returnRangeParams(my_config[this->active_menu_id].value);
+          
+          
+          int f = atoi(my_config[this->current_menu_id].value)-r.step;
+          if(f >= r.value)
+          {
+            itoa(f, my_config[this->current_menu_id].value, 10);
+          }
+
+          this->configSave();
+          
+          output.clearScreen();
+          
+          this->listChildren(this->current_menu_id);      
+        }
+        else if(strcmp(items[this->active_menu_id].function, "setRangeUp") == 0)
+        {
+          Range r;
+          r = this->returnRangeParams(my_config[this->active_menu_id].value);
+          
+          
+          int f = atoi(my_config[this->current_menu_id].value)+r.step;
+          if(f <= r.value)
+          {
+            itoa(f, my_config[this->current_menu_id].value, 10);
+          }
+
+          this->configSave();
+          
+          output.clearScreen();
+          
+          this->listChildren(this->current_menu_id);      
+        }/*
         else if(strcmp(items[this->active_menu_id].function, "changeSettingsCycleEnd") == 0)
         {            
            my_config.single_selection_settings[2] = this->active_menu_id;
@@ -621,6 +682,42 @@ public:
   }
   
 */
+
+  Range returnRangeParams(char* query)
+  {
+    int v, s;   //your variables to be assigned to
+    char * ptr = query;
+    char * eq = NULL; //locate assmts
+    int * num = NULL; //just for starters
+    while (1){
+      eq = strchr(ptr, '=');
+      ptr = eq; // update the pointer
+      if (ptr == NULL) // found no = chars
+        break;
+      switch (*(ptr - 1)){ 
+        case 'v':    //all the possible variables
+          num = &v; break;
+        case 's': 
+          num = &s; break;
+        default:   //unknown variable
+          num = NULL;
+      }
+      ptr++;
+      if (num == NULL) //unrecognized var
+        continue;   // locate next = char
+      *num = 0;
+      while (*ptr && (*ptr != ';')){  // while space or end of string not yet reached
+        *num *= 10;  // extract each int
+        *num += *ptr - '0';
+        ptr++;
+      }
+    }
+
+    Range r;
+    r.value = v;
+    r.step = s;
+    return r;
+  }
 };
 
 
