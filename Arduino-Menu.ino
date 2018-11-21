@@ -42,7 +42,6 @@ void setup() {
   output.setup();
   //Config my_config = menu.returnDefaultConfig();
   
-  
   //menu.configLoad();
   menu.configSaveDefault();
   //my_config[18].value = 0;

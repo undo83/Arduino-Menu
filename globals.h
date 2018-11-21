@@ -15,6 +15,7 @@ int rh = 0;
 #define CONFIG_MENU_EDITOR_CURSOR "_"
 #define CONFIG_MENU_EDITOR_CONFIRM "(e) Confirm "
 #define CONFIG_MENU_EDITOR_CANCEL  "(c) Cancel "
+#define CONFIG_MENU_EDITOR_DELAY 2000 //time between pressing the keys
 
 
 typedef  struct {

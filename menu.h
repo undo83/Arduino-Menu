@@ -50,6 +50,8 @@ public:
   
   char dest[CONFIG_MENU_WIDTH];
   
+  unsigned long timer = 0;//millis();
+  
   Config my_config[sizeof items/sizeof items[0]];
 
   //for now step and range can oly be integers.. I couldn't find a good way to convert float to char*
@@ -356,7 +358,8 @@ public:
           this->parseTitle(my_config[this->active_menu_id].value);
           for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
            this->alphanumeric_buffer[i] = dest[i];
-           
+
+          env = 1; 
           this->changeAlphanumeric();    
         }
         else if(strcmp(items[this->active_menu_id].function, "setNumeric") == 0)
@@ -366,7 +369,8 @@ public:
           for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
            this->alphanumeric_buffer[i] = my_config[this->active_menu_id].value[i];
            
-          this->changeNumeric();    
+          env = 2;
+          this->changeAlphanumeric();    
         }/*
         else if(strcmp(items[this->active_menu_id].function, "changeSettingsCycleEnd") == 0)
         {            
@@ -452,7 +456,6 @@ public:
       output.clearScreen();
 
       
-      
       byte lastChar = strlen(this->alphanumeric_buffer);
       if(lastChar < CONFIG_MENU_WIDTH)
       {
@@ -462,10 +465,19 @@ public:
         {
                  
           input_alphanumeric_position = 0; 
-          this->alphanumeric_buffer[lastChar] = " ";
+          this->alphanumeric_buffer[lastChar] = ' ';
           this->alphanumeric_buffer[lastChar+1] = '\0';
         }
-        
+        else
+        {
+          if(millis() - timer > CONFIG_MENU_EDITOR_DELAY)
+          {            
+            input_alphanumeric_position = 0; 
+            this->alphanumeric_buffer[lastChar] = ' ';
+            this->alphanumeric_buffer[lastChar+1] = '\0';
+          }
+          timer = millis();
+        }
         input_pin = input.incomingByte;  
         //alphanumeric
         if(env==1)
@@ -482,6 +494,7 @@ public:
       }
       
       this->changeAlphanumeric();
+      
     }
     
   return;
@@ -503,20 +516,6 @@ public:
     output.println(CONFIG_MENU_EDITOR_CANCEL);
     
     
-  }
-  void changeNumeric()
-  {
-    env = 2;
-    
-    this->showTitle();
-
-    //this->alphanumeric_buffer = value;
-    
-    output.print(this->alphanumeric_buffer);
-    output.println(CONFIG_MENU_EDITOR_CURSOR);
-    
-    output.print(CONFIG_MENU_EDITOR_CONFIRM);
-    output.println(CONFIG_MENU_EDITOR_CANCEL);
   }
   void saveAlphanumericBufferToMyConfig()
   {
@@ -595,7 +594,50 @@ public:
   }
   void typeNextNumericCharacter()
   {
+    byte lastChar = strlen(this->alphanumeric_buffer);
     
+    if(lastChar < CONFIG_MENU_WIDTH)
+    {
+      //find the used input
+      for(byte i=0; i< sizeof inputs / sizeof inputs[0]; i++)
+      {
+        if(inputs[i].pin == input_pin)
+        {
+
+            if(input_alphanumeric_position>strlen(inputs[i].alphanumeric))
+            {
+              input_alphanumeric_position = 0;
+            }
+
+          
+          byte cycle = 0;
+          while(String(inputs[i].alphanumeric[input_alphanumeric_position]).toInt()==0 && inputs[i].alphanumeric[input_alphanumeric_position] != '0' && cycle < 2)
+          {
+            input_alphanumeric_position++;
+            if(input_alphanumeric_position>strlen(inputs[i].alphanumeric))
+            {
+              input_alphanumeric_position = 0;
+              cycle++;
+            }
+          }
+          //Serial.println(input_alphanumeric_position);
+          if(inputs[i].alphanumeric[input_alphanumeric_position] == '0' || String(inputs[i].alphanumeric[input_alphanumeric_position]).toInt()!=0)
+          {
+            if(this->alphanumeric_buffer[lastChar-1]==inputs[i].alphanumeric[input_alphanumeric_position])
+            {
+              this->alphanumeric_buffer[lastChar] = inputs[i].alphanumeric[input_alphanumeric_position];
+              this->alphanumeric_buffer[lastChar+1] = '\0';
+            }
+            else
+            {
+              this->alphanumeric_buffer[lastChar-1] = inputs[i].alphanumeric[input_alphanumeric_position];        
+              this->alphanumeric_buffer[lastChar] = '\0';
+            }
+          }
+        }
+      }
+    }
+    /*
     byte lastChar = strlen(this->alphanumeric_buffer);
     
     if(lastChar < CONFIG_MENU_WIDTH)
@@ -639,6 +681,7 @@ public:
         }
       }
     }
+    */
   }
   
   /*
