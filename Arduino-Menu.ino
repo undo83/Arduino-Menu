@@ -38,7 +38,6 @@ int temperature = 0;
                   */
 
 void setup() {
-
   output.setup();
   //Config my_config = menu.returnDefaultConfig();
   

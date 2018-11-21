@@ -47,6 +47,7 @@ public:
   char alphanumeric_buffer[CONFIG_MENU_WIDTH];
   byte input_pin = 0;
   byte input_alphanumeric_position = 0;
+  //float input_range = 0;
   
   char dest[CONFIG_MENU_WIDTH];
   
@@ -54,11 +55,6 @@ public:
   
   Config my_config[sizeof items/sizeof items[0]];
 
-  //for now step and range can oly be integers.. I couldn't find a good way to convert float to char*
-  typedef struct{
-    int value;
-    int step;
-  } Range;
 
   void configLoad() {
     //populate my_config with whatever we find in eeprom
@@ -183,7 +179,9 @@ public:
   {
     this->parseTitle(items[current_menu_id].title);
     output.println(dest);
-    output.println("---------------");
+    for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
+      output.print("-");
+    output.println("");  
   }
 
 
@@ -204,10 +202,26 @@ public:
         strcpy(buf,placeholder);
         strcat(buf,value);
         strcat(buf,placeholder);
-        s.replace(buf, items[i].value);
+
+        if(items[i].function == "selectRange")
+        {
+          
+          if(String(my_config[i].value).indexOf("v=")!=-1)
+          {
+            //String();
+            s.replace(buf, String(String(my_config[i].value).substring(String(my_config[i].value).indexOf("v=")+2).toFloat()));
+          }
+          
+        }
+        else
+          s.replace(buf, my_config[i].value);
     }
     
     if(s.length() == 0) s = CONFIG_MENU_EMPTY;
+
+    
+    //if(s.indexOf("v=")!=-1)
+
     
     for(byte j=0;j < CONFIG_MENU_WIDTH; j++)
       dest[j] = s[j];      
@@ -316,41 +330,25 @@ public:
           
           this->listChildren(this->current_menu_id); 
         }
-        else if(strcmp(items[this->active_menu_id].function, "setRangeDown") == 0)
+        else if(strcmp(items[this->active_menu_id].function, "selectRange") == 0)
         {
-          Range r;
-          r = this->returnRangeParams(my_config[this->active_menu_id].value);
+          this->current_menu_id = this->active_menu_id;
           
-          
-          int f = atol(my_config[this->current_menu_id].value)-r.step;
-          if(f >= r.value)
-          {
-            ltoa(f, my_config[this->current_menu_id].value, 10);
-          }
+          float v,m,M,s = 0;
+          //int percent;
+  
+          if(String(my_config[this->active_menu_id].value).indexOf("v=") != -1) v = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("v=")+2).toFloat();
+          if(String(my_config[this->active_menu_id].value).indexOf("m=") != -1) m = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("m=")+2).toFloat();
+          if(String(my_config[this->active_menu_id].value).indexOf("M=") != -1) M = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("M=")+2).toFloat();
+          if(String(my_config[this->active_menu_id].value).indexOf("s=") != -1) s = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("s=")+2).toFloat();
 
-          this->configSave();
-          
-          output.clearScreen();
-          
-          this->listChildren(this->current_menu_id);      
-        }
-        else if(strcmp(items[this->active_menu_id].function, "setRangeUp") == 0)
-        {
-          Range r;
-          r = this->returnRangeParams(my_config[this->active_menu_id].value);
-          
-          
-          int f = atol(my_config[this->current_menu_id].value)+r.step;
-          if(f <= r.value)
-          {
-            ltoa(f, my_config[this->current_menu_id].value, 10);
-          }
 
-          this->configSave();
-          
           output.clearScreen();
+
+          input.range_value = v;
           
-          this->listChildren(this->current_menu_id);      
+          this->showRange(v,m,M,s);
+
         }
         else if(strcmp(items[this->active_menu_id].function, "setAlphaNumeric") == 0)
         {            
@@ -371,49 +369,7 @@ public:
            
           env = 2;
           this->changeAlphanumeric();    
-        }/*
-        else if(strcmp(items[this->active_menu_id].function, "changeSettingsCycleEnd") == 0)
-        {            
-           my_config.single_selection_settings[2] = this->active_menu_id;
-          this->configSave();
-          
-          output.clearScreen();
-          
-          this->listChildren(this->current_menu_id);        
         }
-        else if(strcmp(items[this->active_menu_id].function, "changeCycleStartFrom") == 0)
-        {            
-          my_config.single_selection_settings[3] = this->active_menu_id;
-          this->configSave();
-          
-          output.clearScreen();
-          
-          this->listChildren(this->current_menu_id);        
-        }
-        else if(strcmp(items[this->active_menu_id].function, "changeTPName") == 0)
-        {            
-          output.clearScreen();
-          this->parseTitle(items[items[this->active_menu_id].parent_id].title);
-          for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
-           this->alphanumeric_buffer[i] = dest[i];
-           
-          this->changeAlphanumeric();    
-        }
-        else if(strcmp(items[this->active_menu_id].function, "changeTPT0") == 0 ||
-                strcmp(items[this->active_menu_id].function, "changeTPT1") == 0 ||
-                strcmp(items[this->active_menu_id].function, "changeTPT2") == 0 ||
-                strcmp(items[this->active_menu_id].function, "changeTPT3") == 0 ||
-                strcmp(items[this->active_menu_id].function, "changeTPT4") == 0 ||
-                strcmp(items[this->active_menu_id].function, "changeTPT5") == 0 
-        )
-        {            
-          output.clearScreen();
-          this->parseTitle(items[items[this->active_menu_id].parent_id].title);
-          
-          this->changeTPT();
-          
-        }
-        */
     }
     
     if(input.action == "menu.editor.delete")
@@ -427,6 +383,7 @@ public:
       
       this->changeAlphanumeric();
     }
+    
     if(input.action == "menu.editor.confirm")
     {
       input.action = "";
@@ -440,13 +397,13 @@ public:
       output.clearScreen();
       this->listChildren(items[this->active_menu_id].parent_id); 
     }
+    
     if(input.action == "menu.editor.cancel")
     {
       input.action = "";
       this->alphanumeric_buffer[0] = 0;
       env = 0;
 
-      //input.action = "menu.enter";
       output.clearScreen();
       this->listChildren(items[this->active_menu_id].parent_id); 
     }
@@ -454,7 +411,6 @@ public:
     {
       input.action = "";
       output.clearScreen();
-
       
       byte lastChar = strlen(this->alphanumeric_buffer);
       if(lastChar < CONFIG_MENU_WIDTH)
@@ -489,18 +445,106 @@ public:
         {
           this->typeNextNumericCharacter();
         }
-          
-        //this->alphanumeric_buffer[lastChar+1] = '\0'; //replace it with a NULL
       }
       
       this->changeAlphanumeric();
       
     }
+
     
+    if(input.action == "menu.range.up")
+    {
+      this->current_menu_id = this->active_menu_id;
+        
+      float m,M,s = 0;
+
+      //if(String(my_config[this->active_menu_id].value).indexOf("v=") != -1) v = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("v=")+2).toFloat();
+      if(String(my_config[this->active_menu_id].value).indexOf("m=") != -1) m = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("m=")+2).toFloat();
+      if(String(my_config[this->active_menu_id].value).indexOf("M=") != -1) M = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("M=")+2).toFloat();
+      if(String(my_config[this->active_menu_id].value).indexOf("s=") != -1) s = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("s=")+2).toFloat();
+
+
+      input.action = "";
+      output.clearScreen();
+
+     if(input.range_value+s<=M) input.range_value+= s;
+        
+      this->showRange(input.range_value,m,M,s);
+    }
+    
+    if(input.action == "menu.range.down")
+    {
+      this->current_menu_id = this->active_menu_id;
+        
+      float m,M,s = 0;
+
+      //if(String(my_config[this->active_menu_id].value).indexOf("v=") != -1) v = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("v=")+2).toFloat();
+      if(String(my_config[this->active_menu_id].value).indexOf("m=") != -1) m = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("m=")+2).toFloat();
+      if(String(my_config[this->active_menu_id].value).indexOf("M=") != -1) M = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("M=")+2).toFloat();
+      if(String(my_config[this->active_menu_id].value).indexOf("s=") != -1) s = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("s=")+2).toFloat();
+
+
+      input.action = "";
+      output.clearScreen();
+
+     if(input.range_value-s>=m) input.range_value-= s;
+        
+      this->showRange(input.range_value,m,M,s);
+    }
+    
+    if(input.action == "menu.range.confirm")
+    {
+      input.action = "";
+      
+      //this->saveAlphanumericBufferToMyConfig();
+          
+      //this->configSave();
+      env = 0;
+
+      //input.action = "menu.enter";
+      output.clearScreen();
+      this->listChildren(items[this->active_menu_id].parent_id); 
+    }
+    
+    if(input.action == "menu.range.cancel")
+    {
+      input.action = "";
+      input.range_value = 0;
+      env = 0;
+
+      output.clearScreen();
+      this->listChildren(items[this->active_menu_id].parent_id); 
+    }
   return;
   }
 
-  
+  void showRange(float v,float m, float M,float s)
+  {
+    //setting the Range environment
+    env = 3;
+    
+    this->showTitle();
+    
+    float percent = 0;
+    
+    percent = v*(CONFIG_MENU_WIDTH-2)/(M-m);
+    
+    for(byte i=0;i<(CONFIG_MENU_WIDTH-String(v).length())/2;i++)
+    {
+      output.print(" ");        
+    }
+    output.println(String(v));
+    
+    output.print("[");
+    for(byte i=0;i<CONFIG_MENU_WIDTH-2;i++)
+    {
+      if(i<percent)
+        output.print("=");
+      else 
+        output.print(" ");
+    }
+    output.print("]");
+  }
   void changeAlphanumeric()
   {
     //env = 1;
@@ -637,203 +681,9 @@ public:
         }
       }
     }
-    /*
-    byte lastChar = strlen(this->alphanumeric_buffer);
-    
-    if(lastChar < CONFIG_MENU_WIDTH)
-    {
-      //Serial.println(input_alphanumeric_position);
-        
-      //find the used input
-      for(byte i=0; i< sizeof inputs / sizeof inputs[0]; i++)
-      {
-        if(inputs[i].pin == input_pin)
-        {
-          
-         // (atoi(inputs[i].alphanumeric[input_alphanumeric_position])>0
-          //if there are no numeric values inside, return;
-          bool numeric_values = false;
-          for(byte j=0;j < strlen(inputs[i].alphanumeric);j++)
-          {
-            if(atoi(inputs[i].alphanumeric[j]) > 0 || inputs[i].alphanumeric[j] == '0')
-              numeric_values = true;
-          }
-
-          if(!numeric_values) 
-            return;
-            
-          if(input_alphanumeric_position >= strlen(inputs[i].alphanumeric))
-            input_alphanumeric_position = 0;
-
-          if(atoi(inputs[i].alphanumeric[input_alphanumeric_position])==0)
-          {
-            input_alphanumeric_position++;
-            this->typeNextNumericCharacter();
-          }
-          else
-          {
-              this->alphanumeric_buffer[lastChar-1] = inputs[i].alphanumeric[input_alphanumeric_position];        
-              this->alphanumeric_buffer[lastChar] = '\0';
-          }
-          
-              
-          
-        }
-      }
-    }
-    */
   }
   
-  /*
 
-  byte returnPointsSize()
-  {
-    byte my_size = 0;
-    for(byte i=0;i< sizeof my_config.tp / sizeof my_config.tp[0]; i++)
-    {
-      //if(my_config.tp[i].duration > 0)
-        my_size++;
-    }
-    return my_size;
-  }
-  
-  
-
-
-
-
-  
-  void editRange(int min, int max, int &variable, byte direction)
-  {
-    
-    String s;
-    
-    variable=variable + direction;
-    
-    if(variable<min) variable = min;
-    if(variable>max) variable = max;
-    
-    output.println(variable);
-    s = "[";
-    for(int i=0;i<my_setup.line_length-2;i++)
-    {
-      if(i<floor((my_setup.line_length-2)*variable/(max-min)))
-        s+="-";
-      else
-        s+=" ";
-    }
-    s+="]";
-    Serial.println(s);
-    
-  }
-
-  void changeTPT()
-  {
-    if(strcmp(items[this->active_menu_id].function, "changeTPT0") == 0)
-      //itoa(my_config.tp[0].temperature, this->alphanumeric_buffer, 10);    
-    if(strcmp(items[this->active_menu_id].function, "changeTPT1") == 0)
-     // itoa(my_config.tp[1].temperature, this->alphanumeric_buffer, 10);
-    if(strcmp(items[this->active_menu_id].function, "changeTPT2") == 0)
-     // itoa(my_config.tp[2].temperature, this->alphanumeric_buffer, 10);
-    if(strcmp(items[this->active_menu_id].function, "changeTPT3") == 0)
-      //itoa(my_config.tp[3].temperature, this->alphanumeric_buffer, 10);
-    if(strcmp(items[this->active_menu_id].function, "changeTPT4") == 0)
-      //itoa(my_config.tp[4].temperature, this->alphanumeric_buffer, 10);
-    if(strcmp(items[this->active_menu_id].function, "changeTPT5") == 0)
-      //itoa(my_config.tp[5].temperature, this->alphanumeric_buffer, 10);
-
-      env = 2;
-    
-    this->showTitle();
-
-    //this->alphanumeric_buffer = value;
-    
-    output.print(this->alphanumeric_buffer);
-    output.println(CONFIG_MENU_EDITOR_CURSOR);
-    
-    output.print(CONFIG_MENU_EDITOR_CONFIRM);
-    output.println(CONFIG_MENU_EDITOR_CANCEL);
-  }
-  
-  void changeAlphanumeric()
-  {
-    env = 1;
-    
-    this->showTitle();
-
-    //this->alphanumeric_buffer = value;
-    
-    output.print(this->alphanumeric_buffer);
-    output.println(CONFIG_MENU_EDITOR_CURSOR);
-    
-    output.print(CONFIG_MENU_EDITOR_CONFIRM);
-    output.println(CONFIG_MENU_EDITOR_CANCEL);
-    
-    
-  }
-  void typeNextAlphanumericCharacter()
-  {
-    
-    byte lastChar = strlen(this->alphanumeric_buffer);
-    
-    if(lastChar < CONFIG_MENU_WIDTH)
-    {
-        
-      //find the used input
-      for(byte i=0; i< sizeof inputs / sizeof inputs[0]; i++)
-      {
-        if(inputs[i].pin == input_pin)
-        {
-          if(input_alphanumeric_position >= strlen(inputs[i].alphanumeric))
-            input_alphanumeric_position = 0;
-
-          this->alphanumeric_buffer[lastChar-1] = inputs[i].alphanumeric[input_alphanumeric_position];        
-          this->alphanumeric_buffer[lastChar] = 0;
-              
-          input_alphanumeric_position++;
-        }
-      }
-    }
-  }
-  
-  
-*/
-
-  Range returnRangeParams(char* query)
-  {
-    int v, s;   //your variables to be assigned to
-    char * ptr = query;
-    char * eq = NULL; //locate assmts
-    int * num = NULL; //just for starters
-    while (1){
-      eq = strchr(ptr, '=');
-      ptr = eq; // update the pointer
-      if (ptr == NULL) // found no = chars
-        break;
-      switch (*(ptr - 1)){ 
-        case 'v':    //all the possible variables
-          num = &v; break;
-        case 's': 
-          num = &s; break;
-        default:   //unknown variable
-          num = NULL;
-      }
-      ptr++;
-      if (num == NULL) //unrecognized var
-        continue;   // locate next = char
-      *num = 0;
-      while (*ptr && (*ptr != ';')){  // while space or end of string not yet reached
-        *num *= 10;  // extract each int
-        *num += *ptr - '0';
-        ptr++;
-      }
-    }
-
-    Range r;
-    r.value = v;
-    r.step = s;
-    return r;
-  }
 };
 
 

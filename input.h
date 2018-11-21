@@ -9,7 +9,7 @@ public:
      // for incoming serial data
   byte incomingByte;
   char* action;
-  
+  float range_value = 0;
   void listen()
   {
     if (Serial.available() > 0) {
@@ -27,6 +27,9 @@ public:
         case 1:
         case 2:
           this->parseEditor();
+        break;
+        case 3:
+          this->parseRange();
         break;
       }
 
@@ -60,7 +63,34 @@ public:
     }
   }
 
-  
+  void parseRange()
+  {
+    switch (incomingByte)
+    {
+      // UP ARROW (a)
+      case 97:
+        this->action = "menu.range.up";
+      break;
+
+      // DOWN ARROW
+      case 122:
+        this->action = "menu.range.down";
+      break;
+
+      //ENTER
+      case 101:
+        this->action = "menu.range.confirm";
+      break;
+
+      //CANCEL
+      case 99:
+        this->action = "menu.range.cancel";
+      break;
+
+      default:
+      break;
+    }
+  }
 
   void parseEditor()
   {

@@ -84,94 +84,46 @@ const Item items[]=
 
 /*                      TARGET POINT 0           */
 /*35*/    {4, "Set name", "setAlphaNumeric", "Fermentation"},
-/*36*/    {4, "Temperature: %36%ºC", "listItems", "22"},
-/*37*/    {4, "Humidity: %37%%", "listItems", "75"},
+/*36*/    {4, "Temp: %36%ºC", "selectRange", "v=22;m=0;M=40;s=3"},
+/*37*/    {4, "Humidity: %37%%", "selectRange", "v=75;m=0;M=100;s=1"},
 /*38*/    {4, "Set duration", "setNumeric", "100"},
 /*39*/    {4, "Back", "back"},
 
 /*                      TARGET POINT 1           */
 /*40*/    {5, "Set name", "changeTPName", "Curing 1"},
-/*41*/    {5, "Temperature: %41%ºC", "listItems", "13"},
-/*42*/    {5, "Humidity: %42%%", "listItems", "80"},
+/*41*/    {5, "Temperature: %41%ºC", "selectRange", "v=13;m=0;M=40;s=1"},
+/*42*/    {5, "Humidity: %42%%", "selectRange", "v=80;m=0;M=100;s=1"},
 /*43*/    {5, "Set duration", "setNumeric", "40"},
 /*44*/    {5, "Back", "back"},
 
 /*                      TARGET POINT 2           */
 /*45*/    {6, "Set name", "changeTPName", "Curing 2"},
-/*46*/    {6, "Temperature: %46%ºC", "listItems", "12"},
-/*47*/    {6, "Humidity: %47%%", "listItems", "75"},
+/*46*/    {6, "Temperature: %46%ºC", "selectRange", "v=12;m=0;M=40;s=1"},
+/*47*/    {6, "Humidity: %47%%", "selectRange", "v=80;m=0;M=100;s=1"},
 /*48*/    {6, "Set duration", "setNumeric", "24"},
 /*49*/    {6, "Back", "back"},
 
 /*                      TARGET POINT 3           */
 /*50*/    {7, "Set name", "changeTPName"},
-/*51*/    {7, "Temperature: %51%ºC", "listItems"},
-/*52*/    {7, "Humidity: %52%%", "listItems"},
+/*51*/    {7, "Temperature: %51%ºC", "selectRange","v=12;m=0;M=40;s=1"},
+/*52*/    {7, "Humidity: %52%%", "selectRange","v=80;m=0;M=100;s=1"},
 /*53*/    {7, "Set duration", "setNumeric"},
 /*54*/    {7, "Back", "back"},
 
 /*                      TARGET POINT 4           */
 /*55*/    {8, "Set name", "changeTPName"},
-/*56*/    {8, "Temperature: %56%ºC", "listItems"},
-/*57*/    {8, "Humidity: %57%%", "listItems"},
+/*56*/    {8, "Temperature: %56%ºC", "selectRange","v=12;m=0;M=40;s=1"},
+/*57*/    {8, "Humidity: %57%%", "selectRange","v=80;m=0;M=100;s=1"},
 /*58*/    {8, "Set duration", "setNumeric"},
 /*59*/    {8, "Back", "back"},
 
 /*                      TARGET POINT 5           */
 /*60*/    {9, "Set name", "changeTPName"},
-/*61*/    {9, "Temperature: %61%ºC", "listItems"},
-/*62*/    {9, "Humidity: %62%%", "listItems"},
+/*61*/    {9, "Temperature: %61%ºC", "selectRange","v=12;m=0;M=40;s=1"},
+/*62*/    {9, "Humidity: %62%%", "selectRange","v=80;m=0;M=100;s=1"},
 /*63*/    {9, "Set duration", "setNumeric"},
 /*64*/    {9, "Back", "back"},
 
-          {36, "-", "setRangeDown","v=0;s=1"},
-          {36, "+", "setRangeUp","v=40;s=1"},
-          {36, "Back", "back"},
-
-          {37, "-", "setRangeDown","v=0;s=1"},
-          {37, "+", "setRangeUp","v=100;s=1"},
-          {37, "Back", "back"},
-
-          {41, "-", "setRangeDown","v=0;s=1"},
-          {41, "+", "setRangeUp","v=40;s=1"},
-          {41, "Back", "back"},
-
-          {42, "-", "setRangeDown","v=0;s=1"},
-          {42, "+", "setRangeUp","v=100;s=1"},
-          {42, "Back", "back"},
-
-          {46, "-", "setRangeDown","v=0;s=1"},
-          {46, "+", "setRangeUp","v=40;s=1"},
-          {46, "Back", "back"},
-
-          {47, "-", "setRangeDown","v=0;s=1"},
-          {47, "+", "setRangeUp","v=100;s=1"},
-          {47, "Back", "back"},
-
-          {51, "-", "setRangeDown","v=0;s=1"},
-          {51, "+", "setRangeUp","v=40;s=1"},
-          {51, "Back", "back"},
-
-          {52, "-", "setRangeDown","v=0;s=1"},
-          {52, "+", "setRangeUp","v=100;s=1"},
-          {52, "Back", "back"},
-
-          {56, "-", "setRangeDown","v=0;s=1"},
-          {56, "+", "setRangeUp","v=40;s=1"},
-          {56, "Back", "back"},
-
-          {57, "-", "setRangeDown","v=0;s=1"},
-          {57, "+", "setRangeUp","v=100;s=1"},
-          {57, "Back", "back"},
-
-          {61, "-", "setRangeDown","v=0;s=1"},
-          {61, "+", "setRangeUp","v=40;s=1"},
-          {61, "Back", "back"},
-
-          {62, "-", "setRangeDown","v=0;s=1"},
-          {62, "+", "setRangeUp","v=100;s=1"},
-          {62, "Back", "back"},
-          
 //additional configuration parameters
           {-2,"currentTime","","0"},
 
@@ -248,6 +200,13 @@ typedef struct
   char* value;
 } Config;
 
+//for now step and range can oly be integers.. I couldn't find a good way to convert float to char*
+typedef struct{
+  float value;
+  float min;
+  float Max;
+  float step;
+} Range;
 /*
 
 typedef struct {
