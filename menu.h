@@ -371,7 +371,8 @@ public:
           this->current_menu_id = this->active_menu_id;
 
           EEPROM.get(this->active_menu_id*CONFIG_MENU_WIDTH,EEPROMbuf);
-          r = this->parseRange(EEPROMbuf);
+          r = this->parseRange(EEPROMbuf, items[this->active_menu_id].params);
+          
           output.clearScreen();
 
           //input.range_value = r.v;
@@ -683,11 +684,12 @@ public:
     }
   }
 
-  Range parseRange(char* query)
+  Range parseRange(char value[CONFIG_MENU_WIDTH], char* query)
   {
     Range range;
-    
-    if(String(query).indexOf("v=") != -1) range.v = String(query).substring(String(query).indexOf("v=")+2).toFloat();
+    // r = this->parseRange(EEPROMbuf, items[this->active_menu_id].params);
+    //if(String(query).indexOf("v=") != -1) range.v = String(query).substring(String(query).indexOf("v=")+2).toFloat();
+    range.v = String(value).toFloat();
     if(String(query).indexOf("m=") != -1) range.m = String(query).substring(String(query).indexOf("m=")+2).toFloat();
     if(String(query).indexOf("M=") != -1) range.M = String(query).substring(String(query).indexOf("M=")+2).toFloat();
     if(String(query).indexOf("s=") != -1) range.s = String(query).substring(String(query).indexOf("s=")+2).toFloat();
