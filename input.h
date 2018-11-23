@@ -9,7 +9,7 @@ public:
      // for incoming serial data
   byte incomingByte;
   char* action;
-  float range_value = 0;
+
   void listen()
   {
     if (Serial.available() > 0) {

@@ -30,21 +30,12 @@ switch(function)
 
 
 int temperature = 0;
- /* environment:  0 - children menu items display; 
-                  1 - list points;
-                  2 - change range;
-                  3 - integer input;
-                  4 - alphanumeric input;
-                  */
 
 void setup() {
   output.setup();
   //Config my_config = menu.returnDefaultConfig();
-  
-  //menu.configLoad();
-  menu.configSaveDefault();
-  //my_config[18].value = 0;
-  //my_config[19].value = 1;
+
+  menu.EEPROMCheck();
 
   menu.setCurrentMenuId(0);
   menu.setSelectedMenuId(0);

@@ -8,8 +8,8 @@ private:
   
   bool checkSelected(byte id)
   {
-
-    if(atoi(my_config[id].value) == 1) return true;
+    EEPROM.get(id*CONFIG_MENU_WIDTH,EEPROMbuf);
+    if(atoi(EEPROMbuf) == 1) return true;
     else return false;
     /*
     for(byte i = 0; i< sizeof my_config.single_selection_settings / sizeof my_config.single_selection_settings[0];i++)
@@ -19,7 +19,7 @@ private:
     }
     
     return false;
-    */
+  */  
   }
   
   byte returnChildrenSize(byte parent_id)
@@ -43,19 +43,21 @@ public:
   
   byte total = 0;
   byte active = 0;
-
+  
+  char EEPROMbuf[CONFIG_MENU_WIDTH];
   char alphanumeric_buffer[CONFIG_MENU_WIDTH];
   byte input_pin = 0;
   byte input_alphanumeric_position = 0;
-  //float input_range = 0;
+  
+  Range r;
   
   char dest[CONFIG_MENU_WIDTH];
   
   unsigned long timer = 0;//millis();
   
-  Config my_config[sizeof items/sizeof items[0]];
+  //Config my_config[sizeof items/sizeof items[0]];
 
-
+/*
   void configLoad() {
     //populate my_config with whatever we find in eeprom
     this->configReturn();
@@ -66,26 +68,50 @@ public:
       this->configSaveDefault();
     }
   }
-  
-  void configSaveDefault()
+*/  
+  void EEPROMSaveDefault()
   {
-    
-    configReturnDefault();
-    
-    //write default config to eeprom
-    configSave();
-    
+      /*for (int i = 0 ; i < EEPROM.length() ; i++) {
+        EEPROM.write(i, 0);
+      }*/
+      /*                      DEFAULTS              */
+      EEPROM.put(0,"init");
+      EEPROM.put(CONFIG_MENU_WIDTH*18,"1");
+      EEPROM.put(CONFIG_MENU_WIDTH*21,"1");
+      EEPROM.put(CONFIG_MENU_WIDTH*25,"1");
+      EEPROM.put(CONFIG_MENU_WIDTH*28,"1");
+      EEPROM.put(CONFIG_MENU_WIDTH*35,"Fermentation");
+      EEPROM.put(CONFIG_MENU_WIDTH*36,"22");
+      EEPROM.put(CONFIG_MENU_WIDTH*37,"75");
+      EEPROM.put(CONFIG_MENU_WIDTH*38,"100");
+      EEPROM.put(CONFIG_MENU_WIDTH*40,"Curing 1");
+      EEPROM.put(CONFIG_MENU_WIDTH*41,"13");
+      EEPROM.put(CONFIG_MENU_WIDTH*42,"80");
+      EEPROM.put(CONFIG_MENU_WIDTH*43,"100");
+      EEPROM.put(CONFIG_MENU_WIDTH*40,"Curing 2");
+      EEPROM.put(CONFIG_MENU_WIDTH*41,"15");
+      EEPROM.put(CONFIG_MENU_WIDTH*42,"75");
+      EEPROM.put(CONFIG_MENU_WIDTH*43,"24");    
   }
 
-  void configSave() { 
-    //write config to eeprom
-    for (unsigned int t=0; t<sizeof(my_config); t++)
-    {
-      EEPROM.write(CONFIG_EEPROM_START + t, *((char*)&my_config + t));
+  void EEPROMPut(byte id, char* value) { 
+    //int t;
+    //for(byte i=0;i < id; i++)
+    EEPROM.put(CONFIG_EEPROM_START*id,&value);
+  }
+
+
+  void EEPROMCheck()
+  {    
+    EEPROM.get(0,EEPROMbuf);
+    if(strcmp(EEPROMbuf, "init") != 0)
+    {        
+      EEPROMSaveDefault();
+      Serial.println("not initialized");
     }
   }
 
-
+/*
   void configReturn()
   {
     for (unsigned int t=0; t<sizeof(my_config); t++)
@@ -106,7 +132,7 @@ public:
       EEPROM.write(i, 0);
     }
   }
-  
+  */
   void setCurrentMenuId(byte menu_id)
   {
     current_menu_id = menu_id;
@@ -203,18 +229,11 @@ public:
         strcat(buf,value);
         strcat(buf,placeholder);
 
-        if(items[i].function == "selectRange")
+        if(s.indexOf(buf)>=0)
         {
-          
-          if(String(my_config[i].value).indexOf("v=")!=-1)
-          {
-            //String();
-            s.replace(buf, String(String(my_config[i].value).substring(String(my_config[i].value).indexOf("v=")+2).toFloat()));
-          }
-          
-        }
-        else
-          s.replace(buf, my_config[i].value);
+          EEPROM.get(i*CONFIG_MENU_WIDTH,EEPROMbuf);
+          s.replace(buf, EEPROMbuf);
+        }        
     }
     
     if(s.length() == 0) s = CONFIG_MENU_EMPTY;
@@ -281,7 +300,21 @@ public:
           output.clearScreen();
           
           this->listChildren(this->current_menu_id);        
-        }        
+        }    
+        
+     else if(strcmp(items[this->active_menu_id].function, "listEEPROM") == 0)
+    {
+        input.action = "";
+      output.clearScreen();
+      int t=0;
+      char* c;
+      for(byte i=0;i<sizeof items/sizeof items[0];i++)
+      {
+        EEPROM.get(t,c);
+        Serial.println(c);
+        t+= sizeof(c);
+      }
+    }    
         else if(strcmp(items[this->active_menu_id].function, "back") == 0)
         {            
           this->current_menu_id = items[this->current_menu_id].parent_id;
@@ -299,15 +332,17 @@ public:
             //all the options with the same parent_id get 0, the selected one gets 1
             if(items[i].parent_id == items[this->active_menu_id].parent_id && i != this->active_menu_id)
             {
-              my_config[i].value = 0;
+              //my_config[i].value = "0";
+              EEPROMPut(i, "0");
             }
 
             if(i == this->active_menu_id)
-              my_config[i].value = "1";
+              //my_config[i].value = "1";
+              EEPROMPut(i, "1");
               
           }
           
-          this->configSave();
+          //this->configSave(i, my_config[i].value);
 
           this->current_menu_id = items[this->active_menu_id].parent_id;
 
@@ -317,12 +352,13 @@ public:
         }
         else if(strcmp(items[this->active_menu_id].function, "setMultipleOption") == 0)
         {
-          if(my_config[this->active_menu_id].value == 0)
-            my_config[this->active_menu_id].value = "1";
+          EEPROM.get(this->active_menu_id*CONFIG_MENU_WIDTH,EEPROMbuf);
+          if(EEPROMbuf[0] == '0')
+            EEPROMPut(this->active_menu_id, '1');
           else
-            my_config[this->active_menu_id].value = 0;
+            EEPROMPut(this->active_menu_id, '0');
           
-          this->configSave();
+          //this->configSave(this->active_menu_id, my_config[this->active_menu_id].value);
 
           this->current_menu_id = items[this->active_menu_id].parent_id;
 
@@ -333,27 +369,21 @@ public:
         else if(strcmp(items[this->active_menu_id].function, "selectRange") == 0)
         {
           this->current_menu_id = this->active_menu_id;
-          
-          float v,m,M,s = 0;
-          //int percent;
-  
-          if(String(my_config[this->active_menu_id].value).indexOf("v=") != -1) v = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("v=")+2).toFloat();
-          if(String(my_config[this->active_menu_id].value).indexOf("m=") != -1) m = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("m=")+2).toFloat();
-          if(String(my_config[this->active_menu_id].value).indexOf("M=") != -1) M = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("M=")+2).toFloat();
-          if(String(my_config[this->active_menu_id].value).indexOf("s=") != -1) s = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("s=")+2).toFloat();
 
-
+          EEPROM.get(this->active_menu_id*CONFIG_MENU_WIDTH,EEPROMbuf);
+          r = this->parseRange(EEPROMbuf);
           output.clearScreen();
 
-          input.range_value = v;
+          //input.range_value = r.v;
           
-          this->showRange(v,m,M,s);
+          this->showRange(r);
 
         }
         else if(strcmp(items[this->active_menu_id].function, "setAlphaNumeric") == 0)
         {            
           output.clearScreen();
-          this->parseTitle(my_config[this->active_menu_id].value);
+          EEPROM.get(this->active_menu_id*CONFIG_MENU_WIDTH,EEPROMbuf);
+          this->parseTitle(EEPROMbuf);
           for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
            this->alphanumeric_buffer[i] = dest[i];
 
@@ -363,9 +393,11 @@ public:
         else if(strcmp(items[this->active_menu_id].function, "setNumeric") == 0)
         {            
           output.clearScreen();
-          this->parseTitle(my_config[this->active_menu_id].value);
+          EEPROM.get(this->active_menu_id*CONFIG_MENU_WIDTH,EEPROMbuf);
+          //char* c = EEPROMGet(this->active_menu_id);
+          this->parseTitle(EEPROMbuf);
           for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
-           this->alphanumeric_buffer[i] = my_config[this->active_menu_id].value[i];
+           this->alphanumeric_buffer[i] = EEPROMbuf[i];
            
           env = 2;
           this->changeAlphanumeric();    
@@ -390,7 +422,7 @@ public:
       
       this->saveAlphanumericBufferToMyConfig();
           
-      this->configSave();
+      //this->configSave();
       env = 0;
 
       //input.action = "menu.enter";
@@ -455,53 +487,44 @@ public:
     if(input.action == "menu.range.up")
     {
       this->current_menu_id = this->active_menu_id;
-        
-      float m,M,s = 0;
-
-      //if(String(my_config[this->active_menu_id].value).indexOf("v=") != -1) v = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("v=")+2).toFloat();
-      if(String(my_config[this->active_menu_id].value).indexOf("m=") != -1) m = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("m=")+2).toFloat();
-      if(String(my_config[this->active_menu_id].value).indexOf("M=") != -1) M = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("M=")+2).toFloat();
-      if(String(my_config[this->active_menu_id].value).indexOf("s=") != -1) s = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("s=")+2).toFloat();
-
-
+      
       input.action = "";
       output.clearScreen();
 
-     if(input.range_value+s<=M) input.range_value+= s;
-        
-      this->showRange(input.range_value,m,M,s);
+      if(r.v+r.s<=r.M) r.v+= r.s;
+      else
+        r.v = r.M;
+      
+      this->showRange(r);
     }
     
     if(input.action == "menu.range.down")
     {
       this->current_menu_id = this->active_menu_id;
-        
-      float m,M,s = 0;
-
-      //if(String(my_config[this->active_menu_id].value).indexOf("v=") != -1) v = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("v=")+2).toFloat();
-      if(String(my_config[this->active_menu_id].value).indexOf("m=") != -1) m = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("m=")+2).toFloat();
-      if(String(my_config[this->active_menu_id].value).indexOf("M=") != -1) M = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("M=")+2).toFloat();
-      if(String(my_config[this->active_menu_id].value).indexOf("s=") != -1) s = String(my_config[this->active_menu_id].value).substring(String(my_config[this->active_menu_id].value).indexOf("s=")+2).toFloat();
-
-
+      //r = this->parseRange(my_config[this->active_menu_id].value);  
+      
       input.action = "";
       output.clearScreen();
 
-     if(input.range_value-s>=m) input.range_value-= s;
-        
-      this->showRange(input.range_value,m,M,s);
+      if(r.v-r.s>=r.m) r.v-= r.s;
+      else
+        r.v = r.m;
+      
+      
+      this->showRange(r);
     }
     
     if(input.action == "menu.range.confirm")
     {
+
+      this->saveRange();
+
+      //this->configSave();
+      
       input.action = "";
       
-      //this->saveAlphanumericBufferToMyConfig();
-          
-      //this->configSave();
       env = 0;
-
-      //input.action = "menu.enter";
+      this->current_menu_id = items[this->active_menu_id].parent_id;
       output.clearScreen();
       this->listChildren(items[this->active_menu_id].parent_id); 
     }
@@ -509,16 +532,17 @@ public:
     if(input.action == "menu.range.cancel")
     {
       input.action = "";
-      input.range_value = 0;
+      
       env = 0;
 
+      this->current_menu_id = items[this->active_menu_id].parent_id;
       output.clearScreen();
       this->listChildren(items[this->active_menu_id].parent_id); 
     }
   return;
   }
 
-  void showRange(float v,float m, float M,float s)
+  void showRange(Range range)
   {
     //setting the Range environment
     env = 3;
@@ -527,13 +551,13 @@ public:
     
     float percent = 0;
     
-    percent = v*(CONFIG_MENU_WIDTH-2)/(M-m);
+    percent = range.v*(CONFIG_MENU_WIDTH-2)/(range.M-range.m);
     
-    for(byte i=0;i<(CONFIG_MENU_WIDTH-String(v).length())/2;i++)
+    for(byte i=0;i<(CONFIG_MENU_WIDTH-String(range.v).length())/2;i++)
     {
       output.print(" ");        
     }
-    output.println(String(v));
+    output.println(String(range.v));
     
     output.print("[");
     for(byte i=0;i<CONFIG_MENU_WIDTH-2;i++)
@@ -547,11 +571,8 @@ public:
   }
   void changeAlphanumeric()
   {
-    //env = 1;
     
     this->showTitle();
-
-    //this->alphanumeric_buffer = value;
     
     output.print(this->alphanumeric_buffer);
     output.println(CONFIG_MENU_EDITOR_CURSOR);
@@ -563,43 +584,22 @@ public:
   }
   void saveAlphanumericBufferToMyConfig()
   {
-    //my_config[this->active_menu_id].value[0] = '\0';
-    //for(byte j=0;j<CONFIG_MENU_WIDTH;j++)
-     // my_config[this->active_menu_id].value[j] = this->alphanumeric_buffer[j];
-    //this->my_config[this->active_menu_id].value =this->alphanumeric_buffer;
-    /*
-    char buf[CONFIG_MENU_WIDTH];
-    const char *first = "%tpname";
-    const char second[16];
-    const char *third = "%";
-    for(byte i = 0; i< sizeof my_config.tp / sizeof my_config.tp[0]; i++)
-    {
-      buf[0] = 0;
-      itoa(i, second, 10);
-      strcpy(buf,first);
-      strcat(buf,second);
-      strcat(buf,third);
-      if(strcmp(items[items[this->active_menu_id].parent_id].title, buf) == 0)
-      {
-      }
-    }
-    
-    this->alphanumeric_buffer[0] = 0;
-    */
-    
+    //char* c = EEPROMGet(this->active_menu_id);
         switch(env)
         {//title
           case 1:
-            for(byte j=0;j<strlen(this->alphanumeric_buffer);j++)
-              my_config[this->active_menu_id].value[j] = this->alphanumeric_buffer[j];
+            //for(byte j=0;j<strlen(this->alphanumeric_buffer);j++)
+              //c[j] = this->alphanumeric_buffer[j];
+              EEPROMPut(this->active_menu_id, this->alphanumeric_buffer);
               
-            my_config[this->active_menu_id].value[strlen(this->alphanumeric_buffer)] = '\0';
+            //my_config[this->active_menu_id].value[strlen(this->alphanumeric_buffer)] = '\0';
           break;
 
           case 2:
-            for(byte j=0;j<strlen(this->alphanumeric_buffer);j++)
-              my_config[this->active_menu_id].value[j] = this->alphanumeric_buffer[j];
-             my_config[this->active_menu_id].value[strlen(this->alphanumeric_buffer)] = '\0';
+            //for(byte j=0;j<strlen(this->alphanumeric_buffer);j++)
+              //my_config[this->active_menu_id].value[j] = this->alphanumeric_buffer[j];
+            // my_config[this->active_menu_id].value[strlen(this->alphanumeric_buffer)] = '\0';
+            EEPROMPut(this->active_menu_id, this->alphanumeric_buffer);
           break;
 
           case 3:
@@ -681,6 +681,50 @@ public:
         }
       }
     }
+  }
+
+  Range parseRange(char* query)
+  {
+    Range range;
+    
+    if(String(query).indexOf("v=") != -1) range.v = String(query).substring(String(query).indexOf("v=")+2).toFloat();
+    if(String(query).indexOf("m=") != -1) range.m = String(query).substring(String(query).indexOf("m=")+2).toFloat();
+    if(String(query).indexOf("M=") != -1) range.M = String(query).substring(String(query).indexOf("M=")+2).toFloat();
+    if(String(query).indexOf("s=") != -1) range.s = String(query).substring(String(query).indexOf("s=")+2).toFloat();
+
+    return range;
+  }
+
+  void saveRange()
+  {
+    
+    String s;
+    //char *c = 'v=13.00;m=0.00;M=100.00;s=1.00\0';
+    
+    s = "v="+String(r.v)+";m="+String(r.m)+";M="+String(r.M)+";s="+String(r.s);
+   // for(byte i=0;i<s.length();i++)
+     // c[i] = s[i];
+    //c = s.c_str();
+   //buf[0] = 0;
+        //itoa(i, value, 10);
+        //strcpy(c,"v=");
+       // strcat(c,String(r.v).toCharArray());
+       // strcat(c,";m=");
+       // strcat(c,String(r.m).toCharArray());
+    
+   //Serial.println(c);   
+    //s.toCharArray(c,50);
+    //p = &c; 
+    //EEPROM.update(72,c);
+    //Serial.println(EEPROMGet(36));
+    //EEPROM.update(72,c);
+    //Serial.println(c);
+    EEPROM.update(this->active_menu_id*2, 'a');
+    ///for(byte i=0;i<s.length();i++)
+      //c[i] = s[i];
+    //EEPROMPut(this->active_menu_id, c);
+    //Serial.println(EEPROMGet(36));
+    //Serial.println(p);  
   }
   
 
