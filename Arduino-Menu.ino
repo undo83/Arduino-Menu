@@ -35,7 +35,8 @@ void setup() {
   output.setup();
   //Config my_config = menu.returnDefaultConfig();
 
-  menu.EEPROMCheck();
+  //menu.EEPROMCheck();
+  menu.EEPROMSaveDefault();
 
   menu.setCurrentMenuId(0);
   menu.setSelectedMenuId(0);

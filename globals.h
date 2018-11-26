@@ -97,35 +97,35 @@ const Item items[]=
 /*39*/    {4, "Back", "back"},
 
 /*                      TARGET POINT 1           */
-/*40*/    {5, "Set name", "changeTPName"},
+/*40*/    {5, "Set name", "setAlphaNumeric"},
 /*41*/    {5, "Temperature: %41%ºC", "selectRange","m=0;M=40;s=1"},
 /*42*/    {5, "Humidity: %42%%", "selectRange","m=0;M=100;s=1"},
 /*43*/    {5, "Set duration", "setNumeric"},
 /*44*/    {5, "Back", "back"},
 
 /*                      TARGET POINT 2           */
-/*45*/    {6, "Set name", "changeTPName"},
+/*45*/    {6, "Set name", "setAlphaNumeric"},
 /*46*/    {6, "Temperature: %46%ºC", "selectRange","m=0;M=40;s=1"},
 /*47*/    {6, "Humidity: %47%%", "selectRange","m=0;M=100;s=1"},
 /*48*/    {6, "Set duration", "setNumeric"},
 /*49*/    {6, "Back", "back"},
 
 /*                      TARGET POINT 3           */
-/*50*/    {7, "Set name", "changeTPName"},
+/*50*/    {7, "Set name", "setAlphaNumeric"},
 /*51*/    {7, "Temperature: %51%ºC", "selectRange","m=0;M=40;s=1"},
 /*52*/    {7, "Humidity: %52%%", "selectRange","m=0;M=100;s=1"},
 /*53*/    {7, "Set duration", "setNumeric"},
 /*54*/    {7, "Back", "back"},
 
 /*                      TARGET POINT 4           */
-/*55*/    {8, "Set name", "changeTPName"},
+/*55*/    {8, "Set name", "setAlphaNumeric"},
 /*56*/    {8, "Temperature: %56%ºC", "selectRange","m=0;M=40;s=1"},
 /*57*/    {8, "Humidity: %57%%", "selectRange","m=0;M=100;s=1"},
 /*58*/    {8, "Set duration", "setNumeric" },
 /*59*/    {8, "Back", "back"},
 
 /*                      TARGET POINT 5           */
-/*60*/    {9, "Set name", "changeTPName"},
+/*60*/    {9, "Set name", "setAlphaNumeric"},
 /*61*/    {9, "Temperature: %61%ºC", "selectRange","m=0;M=40;s=1"},
 /*62*/    {9, "Humidity: %62%%", "selectRange","m=0;M=100;s=1"},
 /*63*/    {9, "Set duration", "setNumeric"},

@@ -57,23 +57,8 @@ public:
   
   //Config my_config[sizeof items/sizeof items[0]];
 
-/*
-  void configLoad() {
-    //populate my_config with whatever we find in eeprom
-    this->configReturn();
-    
-    //if we don't have init as the first value, we populate the eeprom with default values
-    if(my_config[0].value != "init")
-    {
-      this->configSaveDefault();
-    }
-  }
-*/  
   void EEPROMSaveDefault()
   {
-      /*for (int i = 0 ; i < EEPROM.length() ; i++) {
-        EEPROM.write(i, 0);
-      }*/
       /*                      DEFAULTS              */
       EEPROM.put(0,"init");
       EEPROM.put(CONFIG_MENU_WIDTH*18,"1");
@@ -88,51 +73,23 @@ public:
       EEPROM.put(CONFIG_MENU_WIDTH*41,"13");
       EEPROM.put(CONFIG_MENU_WIDTH*42,"80");
       EEPROM.put(CONFIG_MENU_WIDTH*43,"100");
-      EEPROM.put(CONFIG_MENU_WIDTH*40,"Curing 2");
-      EEPROM.put(CONFIG_MENU_WIDTH*41,"15");
-      EEPROM.put(CONFIG_MENU_WIDTH*42,"75");
-      EEPROM.put(CONFIG_MENU_WIDTH*43,"24");    
+      EEPROM.put(CONFIG_MENU_WIDTH*45,"Curing 2");
+      EEPROM.put(CONFIG_MENU_WIDTH*46,"15");
+      EEPROM.put(CONFIG_MENU_WIDTH*47,"75");
+      EEPROM.put(CONFIG_MENU_WIDTH*48,"24");    
   }
-
-  void EEPROMPut(byte id, char* value) { 
-    //int t;
-    //for(byte i=0;i < id; i++)
-    EEPROM.put(CONFIG_EEPROM_START*id,&value);
-  }
-
 
   void EEPROMCheck()
   {    
     EEPROM.get(0,EEPROMbuf);
     if(strcmp(EEPROMbuf, "init") != 0)
-    {        
-      EEPROMSaveDefault();
-      Serial.println("not initialized");
+    { 
+      Serial.println("Not initialized. Initializing now...");       
+      this->EEPROMSaveDefault();
+      
     }
   }
 
-/*
-  void configReturn()
-  {
-    for (unsigned int t=0; t<sizeof(my_config); t++)
-        *((char*)&my_config + t) = EEPROM.read(CONFIG_EEPROM_START + t);    
-  }
-
-  void configReturnDefault()
-  {
-    for(byte i=0;i<sizeof items/sizeof items[0];i++)
-    {
-      my_config[i].value = items[i].value;
-    }
-  }
-
-  void eepromFlash()
-  { 
-    for (int i = 0 ; i < EEPROM.length() ; i++) {
-      EEPROM.write(i, 0);
-    }
-  }
-  */
   void setCurrentMenuId(byte menu_id)
   {
     current_menu_id = menu_id;
@@ -143,7 +100,7 @@ public:
   void setSelectedMenuId(byte menu_id)
   {
     active_menu_id = menu_id;
-    this->changeSelection(1);
+    this->changeSelection(true);
     return;
   }
 
@@ -246,20 +203,35 @@ public:
       dest[j] = s[j];      
   }
   
-  void changeSelection(byte direction)
+  void changeSelection(bool direction)
   {
     byte n_items = sizeof items / sizeof items[0];
     
-    active_menu_id=active_menu_id+direction;
     
+      if(direction) this->active_menu_id++;
+      else this->active_menu_id--;
+      
+      //if(this->active_menu_id < 0) this->active_menu_id = n_items-1;
+      if(this->active_menu_id >= n_items) this->active_menu_id = 0;
 
-    if(active_menu_id < 0) active_menu_id = n_items-1;
-    if(active_menu_id >= n_items) active_menu_id = 0;
-  
-    if(items[active_menu_id].parent_id != current_menu_id)
-    {
+    //Serial.println(items[this->active_menu_id].parent_id);
+    //Serial.println(this->current_menu_id);
+    //delay(200);
+    if(items[this->active_menu_id].parent_id != this->current_menu_id)
       this->changeSelection(direction);
+      
+    /*
+    while(items[this->active_menu_id].parent_id != this->current_menu_id)
+    {
+      
+      
     }
+    */
+    //if(items[this->active_menu_id].parent_id != this->current_menu_id)
+    //{
+     // this->changeSelection(direction);
+    //}
+
   }
 
 
@@ -269,7 +241,7 @@ public:
     {
         
       input.action = "";
-      this->changeSelection(1);
+      this->changeSelection(true);
       
       output.clearScreen();
       
@@ -279,7 +251,7 @@ public:
     if(input.action == "menu.changeSelectionUp")
     {
         input.action = "";
-        this->changeSelection(-1);
+        this->changeSelection(false);
 
         output.clearScreen();
         
@@ -295,7 +267,7 @@ public:
         {            
           this->current_menu_id = this->active_menu_id;
           this->active_menu_id = 0;
-          this->changeSelection(1);
+          this->changeSelection(true);
           
           output.clearScreen();
           
@@ -304,22 +276,22 @@ public:
         
      else if(strcmp(items[this->active_menu_id].function, "listEEPROM") == 0)
     {
-        input.action = "";
+      input.action = "";
       output.clearScreen();
       int t=0;
-      char* c;
+      char c[22];
       for(byte i=0;i<sizeof items/sizeof items[0];i++)
       {
-        EEPROM.get(t,c);
+        EEPROM.get(i*CONFIG_MENU_WIDTH,c);
         Serial.println(c);
-        t+= sizeof(c);
+       // t+= sizeof(c);
       }
     }    
         else if(strcmp(items[this->active_menu_id].function, "back") == 0)
         {            
           this->current_menu_id = items[this->current_menu_id].parent_id;
           this->active_menu_id = 0;
-          this->changeSelection(1);
+          this->changeSelection(true);
 
           output.clearScreen();
           
@@ -333,12 +305,12 @@ public:
             if(items[i].parent_id == items[this->active_menu_id].parent_id && i != this->active_menu_id)
             {
               //my_config[i].value = "0";
-              EEPROMPut(i, "0");
+              EEPROM.put(CONFIG_MENU_WIDTH*i, '0');
             }
 
             if(i == this->active_menu_id)
               //my_config[i].value = "1";
-              EEPROMPut(i, "1");
+              EEPROM.put(CONFIG_MENU_WIDTH*i, '1');
               
           }
           
@@ -354,9 +326,9 @@ public:
         {
           EEPROM.get(this->active_menu_id*CONFIG_MENU_WIDTH,EEPROMbuf);
           if(EEPROMbuf[0] == '0')
-            EEPROMPut(this->active_menu_id, '1');
+            EEPROM.put(CONFIG_MENU_WIDTH*this->active_menu_id, '1');
           else
-            EEPROMPut(this->active_menu_id, '0');
+            EEPROM.put(CONFIG_MENU_WIDTH*this->active_menu_id, '0');
           
           //this->configSave(this->active_menu_id, my_config[this->active_menu_id].value);
 
@@ -425,6 +397,7 @@ public:
           
       //this->configSave();
       env = 0;
+      
 
       //input.action = "menu.enter";
       output.clearScreen();
@@ -517,10 +490,9 @@ public:
     
     if(input.action == "menu.range.confirm")
     {
-
-      this->saveRange();
-
-      //this->configSave();
+      char buffloat[CONFIG_MENU_WIDTH];
+      String(r.v).toCharArray(buffloat,CONFIG_MENU_WIDTH);
+      EEPROM.put(CONFIG_MENU_WIDTH*this->active_menu_id, buffloat);
       
       input.action = "";
       
@@ -591,7 +563,7 @@ public:
           case 1:
             //for(byte j=0;j<strlen(this->alphanumeric_buffer);j++)
               //c[j] = this->alphanumeric_buffer[j];
-              EEPROMPut(this->active_menu_id, this->alphanumeric_buffer);
+              EEPROM.put(CONFIG_MENU_WIDTH*this->active_menu_id, this->alphanumeric_buffer);
               
             //my_config[this->active_menu_id].value[strlen(this->alphanumeric_buffer)] = '\0';
           break;
@@ -600,7 +572,7 @@ public:
             //for(byte j=0;j<strlen(this->alphanumeric_buffer);j++)
               //my_config[this->active_menu_id].value[j] = this->alphanumeric_buffer[j];
             // my_config[this->active_menu_id].value[strlen(this->alphanumeric_buffer)] = '\0';
-            EEPROMPut(this->active_menu_id, this->alphanumeric_buffer);
+            EEPROM.put(CONFIG_MENU_WIDTH*this->active_menu_id, this->alphanumeric_buffer);
           break;
 
           case 3:
@@ -697,37 +669,6 @@ public:
     return range;
   }
 
-  void saveRange()
-  {
-    
-    String s;
-    //char *c = 'v=13.00;m=0.00;M=100.00;s=1.00\0';
-    
-    s = "v="+String(r.v)+";m="+String(r.m)+";M="+String(r.M)+";s="+String(r.s);
-   // for(byte i=0;i<s.length();i++)
-     // c[i] = s[i];
-    //c = s.c_str();
-   //buf[0] = 0;
-        //itoa(i, value, 10);
-        //strcpy(c,"v=");
-       // strcat(c,String(r.v).toCharArray());
-       // strcat(c,";m=");
-       // strcat(c,String(r.m).toCharArray());
-    
-   //Serial.println(c);   
-    //s.toCharArray(c,50);
-    //p = &c; 
-    //EEPROM.update(72,c);
-    //Serial.println(EEPROMGet(36));
-    //EEPROM.update(72,c);
-    //Serial.println(c);
-    EEPROM.update(this->active_menu_id*2, 'a');
-    ///for(byte i=0;i<s.length();i++)
-      //c[i] = s[i];
-    //EEPROMPut(this->active_menu_id, c);
-    //Serial.println(EEPROMGet(36));
-    //Serial.println(p);  
-  }
   
 
 };

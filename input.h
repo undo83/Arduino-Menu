@@ -41,6 +41,7 @@ public:
   void parseListChildren()
   {
     //output.println(String(incomingByte));
+    Serial.println(incomingByte);
     switch (incomingByte)
     {
       // UP ARROW
