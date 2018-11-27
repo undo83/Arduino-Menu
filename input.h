@@ -8,6 +8,9 @@ private:
 public:
      // for incoming serial data
   byte incomingByte;
+  byte alphanumeric_position = 0;
+  char alphanumeric_buffer[CONFIG_MENU_WIDTH];
+  byte pin = 0;
   char* action;
 
   void listen()

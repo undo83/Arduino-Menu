@@ -4,37 +4,6 @@ class Menu {
 
 private:
 
-
-  
-  bool checkSelected(byte id)
-  {
-    EEPROM.get(id*CONFIG_MENU_WIDTH,EEPROMbuf);
-    if(atoi(EEPROMbuf) == 1) return true;
-    else return false;
-    /*
-    for(byte i = 0; i< sizeof my_config.single_selection_settings / sizeof my_config.single_selection_settings[0];i++)
-    {
-       if(my_config.single_selection_settings[i] == id)
-        return true;
-    }
-    
-    return false;
-  */  
-  }
-  
-  byte returnChildrenSize(byte parent_id)
-  {
-    byte j = 0;
-    for(byte i=0;i<sizeof items/sizeof items[0];i++)
-    {
-      if(items[i].parent_id == parent_id)
-      {
-          j++;
-      }      
-    }
-    return j;
-  }
-  
 public:
 
   byte current_menu_id = 0;
@@ -45,9 +14,6 @@ public:
   byte active = 0;
   
   char EEPROMbuf[CONFIG_MENU_WIDTH];
-  char alphanumeric_buffer[CONFIG_MENU_WIDTH];
-  byte input_pin = 0;
-  byte input_alphanumeric_position = 0;
   
   Range r;
   
@@ -311,7 +277,7 @@ public:
         else if(strcmp(items[this->active_menu_id].function, "setMultipleOption") == 0)
         {
           EEPROM.get(this->active_menu_id*CONFIG_MENU_WIDTH,EEPROMbuf);
-          if(EEPROMbuf[0] == '0')
+          if(EEPROMbuf[0] != '1')
             EEPROM.put(CONFIG_MENU_WIDTH*this->active_menu_id, '1');
           else
             EEPROM.put(CONFIG_MENU_WIDTH*this->active_menu_id, '0');
@@ -344,7 +310,7 @@ public:
           EEPROM.get(this->active_menu_id*CONFIG_MENU_WIDTH,EEPROMbuf);
           this->parseTitle(EEPROMbuf);
           for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
-           this->alphanumeric_buffer[i] = dest[i];
+           input.alphanumeric_buffer[i] = dest[i];
 
           env = 1; 
           this->changeAlphanumeric();    
@@ -356,7 +322,7 @@ public:
           //char* c = EEPROMGet(this->active_menu_id);
           this->parseTitle(EEPROMbuf);
           for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
-           this->alphanumeric_buffer[i] = EEPROMbuf[i];
+           input.alphanumeric_buffer[i] = EEPROMbuf[i];
            
           env = 2;
           this->changeAlphanumeric();    
@@ -369,8 +335,8 @@ public:
       output.clearScreen();
 
       
-      byte lastChar = strlen(this->alphanumeric_buffer)-1;
-      this->alphanumeric_buffer[lastChar] = '\0'; //replace it with a NULL
+      byte lastChar = strlen(input.alphanumeric_buffer)-1;
+      input.alphanumeric_buffer[lastChar] = '\0'; //replace it with a NULL
       
       this->changeAlphanumeric();
     }
@@ -393,7 +359,7 @@ public:
     if(input.action == "menu.editor.cancel")
     {
       input.action = "";
-      this->alphanumeric_buffer[0] = 0;
+      input.alphanumeric_buffer[0] = 0;
       env = 0;
 
       output.clearScreen();
@@ -404,29 +370,29 @@ public:
       input.action = "";
       output.clearScreen();
       
-      byte lastChar = strlen(this->alphanumeric_buffer);
+      byte lastChar = strlen(input.alphanumeric_buffer);
       if(lastChar < CONFIG_MENU_WIDTH)
       {
         
         //if we repeat the last button
-        if(input.incomingByte != input_pin)
+        if(input.incomingByte != input.pin)
         {
                  
-          input_alphanumeric_position = 0; 
-          this->alphanumeric_buffer[lastChar] = ' ';
-          this->alphanumeric_buffer[lastChar+1] = '\0';
+          input.alphanumeric_position = 0; 
+          input.alphanumeric_buffer[lastChar] = ' ';
+          input.alphanumeric_buffer[lastChar+1] = '\0';
         }
         else
         {
           if(millis() - timer > CONFIG_MENU_EDITOR_DELAY)
           {            
-            input_alphanumeric_position = 0; 
-            this->alphanumeric_buffer[lastChar] = ' ';
-            this->alphanumeric_buffer[lastChar+1] = '\0';
+            input.alphanumeric_position = 0; 
+            input.alphanumeric_buffer[lastChar] = ' ';
+            input.alphanumeric_buffer[lastChar+1] = '\0';
           }
           timer = millis();
         }
-        input_pin = input.incomingByte;  
+        input.pin = input.incomingByte;  
         //alphanumeric
         if(env==1)
         { 
@@ -533,7 +499,7 @@ public:
     
     this->showTitle();
     
-    output.print(this->alphanumeric_buffer);
+    output.print(input.alphanumeric_buffer);
     output.println(CONFIG_MENU_EDITOR_CURSOR);
     
     output.print(CONFIG_MENU_EDITOR_CONFIRM);
@@ -547,34 +513,34 @@ public:
         switch(env)
         {//title
           case 1:
-            //for(byte j=0;j<strlen(this->alphanumeric_buffer);j++)
-              //c[j] = this->alphanumeric_buffer[j];
-              EEPROM.put(CONFIG_MENU_WIDTH*this->active_menu_id, this->alphanumeric_buffer);
+            //for(byte j=0;j<strlen(input.alphanumeric_buffer);j++)
+              //c[j] = input.alphanumeric_buffer[j];
+              EEPROM.put(CONFIG_MENU_WIDTH*this->active_menu_id, input.alphanumeric_buffer);
               
-            //my_config[this->active_menu_id].value[strlen(this->alphanumeric_buffer)] = '\0';
+            //my_config[this->active_menu_id].value[strlen(input.alphanumeric_buffer)] = '\0';
           break;
 
           case 2:
-            //for(byte j=0;j<strlen(this->alphanumeric_buffer);j++)
-              //my_config[this->active_menu_id].value[j] = this->alphanumeric_buffer[j];
-            // my_config[this->active_menu_id].value[strlen(this->alphanumeric_buffer)] = '\0';
-            EEPROM.put(CONFIG_MENU_WIDTH*this->active_menu_id, this->alphanumeric_buffer);
+            //for(byte j=0;j<strlen(input.alphanumeric_buffer);j++)
+              //my_config[this->active_menu_id].value[j] = input.alphanumeric_buffer[j];
+            // my_config[this->active_menu_id].value[strlen(input.alphanumeric_buffer)] = '\0';
+            EEPROM.put(CONFIG_MENU_WIDTH*this->active_menu_id, input.alphanumeric_buffer);
           break;
 
           case 3:
-             //my_config.tp[i].rh = atoi(this->alphanumeric_buffer);
+             //my_config.tp[i].rh = atoi(input.alphanumeric_buffer);
           break;
 
           case 4:
-             //my_config.tp[i].duration = atoi(this->alphanumeric_buffer);
+             //my_config.tp[i].duration = atoi(input.alphanumeric_buffer);
           break;
         }
-        this->alphanumeric_buffer[0] = 0;
+        input.alphanumeric_buffer[0] = 0;
   }
   void typeNextAlphanumericCharacter()
   {
     
-    byte lastChar = strlen(this->alphanumeric_buffer);
+    byte lastChar = strlen(input.alphanumeric_buffer);
     
     if(lastChar < CONFIG_MENU_WIDTH)
     {
@@ -582,59 +548,59 @@ public:
       //find the used input
       for(byte i=0; i< sizeof inputs / sizeof inputs[0]; i++)
       {
-        if(inputs[i].pin == input_pin)
+        if(inputs[i].pin == input.pin)
         {
-          if(input_alphanumeric_position >= strlen(inputs[i].alphanumeric))
-            input_alphanumeric_position = 0;
+          if(input.alphanumeric_position >= strlen(inputs[i].alphanumeric))
+            input.alphanumeric_position = 0;
 
-          this->alphanumeric_buffer[lastChar-1] = inputs[i].alphanumeric[input_alphanumeric_position];        
-          this->alphanumeric_buffer[lastChar] = 0;
+          input.alphanumeric_buffer[lastChar-1] = inputs[i].alphanumeric[input.alphanumeric_position];        
+          input.alphanumeric_buffer[lastChar] = 0;
               
-          input_alphanumeric_position++;
+          input.alphanumeric_position++;
         }
       }
     }
   }
   void typeNextNumericCharacter()
   {
-    byte lastChar = strlen(this->alphanumeric_buffer);
+    byte lastChar = strlen(input.alphanumeric_buffer);
     
     if(lastChar < CONFIG_MENU_WIDTH)
     {
       //find the used input
       for(byte i=0; i< sizeof inputs / sizeof inputs[0]; i++)
       {
-        if(inputs[i].pin == input_pin)
+        if(inputs[i].pin == input.pin)
         {
 
-            if(input_alphanumeric_position>strlen(inputs[i].alphanumeric))
+            if(input.alphanumeric_position>strlen(inputs[i].alphanumeric))
             {
-              input_alphanumeric_position = 0;
+              input.alphanumeric_position = 0;
             }
 
           
           byte cycle = 0;
-          while(String(inputs[i].alphanumeric[input_alphanumeric_position]).toInt()==0 && inputs[i].alphanumeric[input_alphanumeric_position] != '0' && cycle < 2)
+          while(String(inputs[i].alphanumeric[input.alphanumeric_position]).toInt()==0 && inputs[i].alphanumeric[input.alphanumeric_position] != '0' && cycle < 2)
           {
-            input_alphanumeric_position++;
-            if(input_alphanumeric_position>strlen(inputs[i].alphanumeric))
+            input.alphanumeric_position++;
+            if(input.alphanumeric_position>strlen(inputs[i].alphanumeric))
             {
-              input_alphanumeric_position = 0;
+              input.alphanumeric_position = 0;
               cycle++;
             }
           }
-          //Serial.println(input_alphanumeric_position);
-          if(inputs[i].alphanumeric[input_alphanumeric_position] == '0' || String(inputs[i].alphanumeric[input_alphanumeric_position]).toInt()!=0)
+          //Serial.println(input.alphanumeric_position);
+          if(inputs[i].alphanumeric[input.alphanumeric_position] == '0' || String(inputs[i].alphanumeric[input.alphanumeric_position]).toInt()!=0)
           {
-            if(this->alphanumeric_buffer[lastChar-1]==inputs[i].alphanumeric[input_alphanumeric_position])
+            if(input.alphanumeric_buffer[lastChar-1]==inputs[i].alphanumeric[input.alphanumeric_position])
             {
-              this->alphanumeric_buffer[lastChar] = inputs[i].alphanumeric[input_alphanumeric_position];
-              this->alphanumeric_buffer[lastChar+1] = '\0';
+              input.alphanumeric_buffer[lastChar] = inputs[i].alphanumeric[input.alphanumeric_position];
+              input.alphanumeric_buffer[lastChar+1] = '\0';
             }
             else
             {
-              this->alphanumeric_buffer[lastChar-1] = inputs[i].alphanumeric[input_alphanumeric_position];        
-              this->alphanumeric_buffer[lastChar] = '\0';
+              input.alphanumeric_buffer[lastChar-1] = inputs[i].alphanumeric[input.alphanumeric_position];        
+              input.alphanumeric_buffer[lastChar] = '\0';
             }
           }
         }
@@ -655,6 +621,26 @@ public:
     return range;
   }
 
+  
+  bool checkSelected(byte id)
+  {
+    EEPROM.get(id*CONFIG_MENU_WIDTH,EEPROMbuf);
+    if(atoi(EEPROMbuf) == 1) return true;
+    else return false;
+  }
+  
+  byte returnChildrenSize(byte parent_id)
+  {
+    byte j = 0;
+    for(byte i=0;i<sizeof items/sizeof items[0];i++)
+    {
+      if(items[i].parent_id == parent_id)
+      {
+          j++;
+      }      
+    }
+    return j;
+  }
   
 
 };
