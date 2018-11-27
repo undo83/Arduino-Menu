@@ -211,26 +211,12 @@ public:
       if(direction) this->active_menu_id++;
       else this->active_menu_id--;
       
-      //if(this->active_menu_id < 0) this->active_menu_id = n_items-1;
+      if(this->active_menu_id <= 0) this->active_menu_id = n_items-1;
       if(this->active_menu_id >= n_items) this->active_menu_id = 0;
 
-    //Serial.println(items[this->active_menu_id].parent_id);
-    //Serial.println(this->current_menu_id);
-    //delay(200);
     if(items[this->active_menu_id].parent_id != this->current_menu_id)
       this->changeSelection(direction);
       
-    /*
-    while(items[this->active_menu_id].parent_id != this->current_menu_id)
-    {
-      
-      
-    }
-    */
-    //if(items[this->active_menu_id].parent_id != this->current_menu_id)
-    //{
-     // this->changeSelection(direction);
-    //}
 
   }
 
