@@ -1,7 +1,5 @@
-int env = 0;
 
-
-#define CONFIG_MENU_LINES 3
+#define CONFIG_MENU_LINES 5
 #define CONFIG_MENU_WIDTH 20
 
 #define CONFIG_MENU_EMPTY "Empty"
@@ -10,6 +8,7 @@ int env = 0;
 #define CONFIG_MENU_EDITOR_CONFIRM "(e) Confirm "
 #define CONFIG_MENU_EDITOR_CANCEL  "(c) Cancel "
 #define CONFIG_MENU_EDITOR_DELAY 2000 //time between pressing the same key
+
 
 typedef struct
 {
@@ -27,6 +26,9 @@ typedef struct {
    short pin;
    char* alphanumeric;
 } Input;
+
+byte env = 0;
+
 
 const Item items[]= 
 {
@@ -131,9 +133,6 @@ const Item items[]=
 
 
 
-
-
-
 const Input inputs[] = 
 {
 /* 1 */  {49," 1"},
@@ -149,6 +148,6 @@ const Input inputs[] =
 /* a */  {97,},         //UP
 /* z */  {122,},        //DOWN  
 /* x */  {120,""},
-/* c */  {99,},
-/* e */  {101,}
+/* c */  {99,},         //cancel key
+/* e */  {101,}         //enter key
 };

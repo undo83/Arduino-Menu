@@ -13,11 +13,10 @@ void setup() {
 
   menu.setCurrentMenuId(0);
   menu.setSelectedMenuId(0);
-  menu.listChildren(menu.current_menu_id);
+  menu.listItems(menu.current_menu_id);
 }
 
 void loop() {
-
 
   input.listen();
   menu.menuAnswer();

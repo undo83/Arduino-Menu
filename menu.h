@@ -12,6 +12,8 @@ public:
   
   byte total = 0;
   byte active = 0;
+  Item item;
+  byte it = 0;
   
   char EEPROMbuf[CONFIG_MENU_WIDTH];
   
@@ -19,10 +21,8 @@ public:
   
   char dest[CONFIG_MENU_WIDTH];
   
-  unsigned long timer = 0;//millis();
+  unsigned long timer = 0;
   
-  //Config my_config[sizeof items/sizeof items[0]];
-
   void EEPROMSaveDefault()
   {
       /*                      DEFAULTS              */
@@ -54,137 +54,9 @@ public:
       this->EEPROMSaveDefault();
       
     }
+    
   }
 
-  void setCurrentMenuId(byte menu_id)
-  {
-    current_menu_id = menu_id;
-    return;
-  }
-
-  
-  void setSelectedMenuId(byte menu_id)
-  {
-    active_menu_id = menu_id;
-    this->changeSelection(true);
-    return;
-  }
-
-  
-  void listChildren(byte parent_id)
-  {
-    //Set environment to children list
-    env = 0;
-
-    this->showTitle();
-
-    total = this->returnChildrenSize(parent_id);
-
-    byte n_items = this->returnChildrenSize(parent_id);
-    
-    byte children_items[n_items];
-
-    //build children_items array
-    byte j = 0;
-    byte active_index = 0;
-    for(byte i=0;i<sizeof items/sizeof items[0];i++)
-    {
-      if(items[i].parent_id == parent_id)
-      {
-        
-        if(active_menu_id == i) active_index = j;
-        
-        //if it's a placeholder parse it, otherwise load it into the children array
-        
-        children_items[j] = i;
-        j++;
-
-        
-      }
-      
-    }
-
-   
-    current_page = floor(active_index/CONFIG_MENU_LINES);
-    for(byte i = current_page * CONFIG_MENU_LINES; i < CONFIG_MENU_LINES * (current_page+1); i++)
-    {
-      if(sizeof children_items / sizeof children_items[0] > i)
-      {
-        this->parseTitle(items[children_items[i]].title);
-        if(children_items[i] == active_menu_id)
-        {
-          output.printActiveLine(dest, this->checkSelected(children_items[i]));
-        }
-        else
-        {
-          output.printNormalLine(dest, this->checkSelected(children_items[i]));
-        }
-      }
-    }
-  }
-
-
-  void showTitle()
-  {
-    this->parseTitle(items[current_menu_id].title);
-    output.println(dest);
-    for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
-      output.print("-");
-    output.println("");  
-  }
-
-
-  void parseTitle(char title[CONFIG_MENU_WIDTH])
-  {
-    String s;
-    char buf[CONFIG_MENU_WIDTH];
-    const char *placeholder = "%";
-    const char value[16];
-    
-    s = String(title);
-        
-    for(byte i=0;i<sizeof items/sizeof items[0];i++)
-    {
-
-        buf[0] = 0;
-        itoa(i, value, 10);
-        strcpy(buf,placeholder);
-        strcat(buf,value);
-        strcat(buf,placeholder);
-
-        if(s.indexOf(buf)>=0)
-        {
-          EEPROM.get(i*CONFIG_MENU_WIDTH,EEPROMbuf);
-          s.replace(buf, EEPROMbuf);
-        }        
-    }
-    
-    if(s.length() == 0) s = CONFIG_MENU_EMPTY;
-
-    
-    //if(s.indexOf("v=")!=-1)
-
-    
-    for(byte j=0;j < CONFIG_MENU_WIDTH; j++)
-      dest[j] = s[j];      
-  }
-  
-  void changeSelection(bool direction)
-  {
-    byte n_items = sizeof items / sizeof items[0];
-    
-    
-      if(direction) this->active_menu_id++;
-      else this->active_menu_id--;
-      
-      if(this->active_menu_id <= 0) this->active_menu_id = n_items-1;
-      if(this->active_menu_id >= n_items) this->active_menu_id = 0;
-
-    if(items[this->active_menu_id].parent_id != this->current_menu_id)
-      this->changeSelection(direction);
-      
-
-  }
 
 
   void menuAnswer()
@@ -197,7 +69,7 @@ public:
       
       output.clearScreen();
       
-      this->listChildren(this->current_menu_id);
+      this->listItems(this->current_menu_id);
     }
     
     if(input.action == "menu.changeSelectionUp")
@@ -207,7 +79,7 @@ public:
 
         output.clearScreen();
         
-        this->listChildren(this->current_menu_id);
+        this->listItems(this->current_menu_id);
     }
     
     
@@ -223,22 +95,9 @@ public:
           
           output.clearScreen();
           
-          this->listChildren(this->current_menu_id);        
+          this->listItems(this->current_menu_id);        
         }    
-        
-     else if(strcmp(items[this->active_menu_id].function, "listEEPROM") == 0)
-    {
-      input.action = "";
-      output.clearScreen();
-      int t=0;
-      char c[22];
-      for(byte i=0;i<sizeof items/sizeof items[0];i++)
-      {
-        EEPROM.get(i*CONFIG_MENU_WIDTH,c);
-        Serial.println(c);
-       // t+= sizeof(c);
-      }
-    }    
+            
         else if(strcmp(items[this->active_menu_id].function, "back") == 0)
         {            
           this->current_menu_id = items[this->current_menu_id].parent_id;
@@ -247,7 +106,7 @@ public:
 
           output.clearScreen();
           
-          this->listChildren(this->current_menu_id);        
+          this->listItems(this->current_menu_id);        
         }
         else if(strcmp(items[this->active_menu_id].function, "setSingleOption") == 0)
         {                 
@@ -272,7 +131,7 @@ public:
 
           output.clearScreen();
           
-          this->listChildren(this->current_menu_id); 
+          this->listItems(this->current_menu_id); 
         }
         else if(strcmp(items[this->active_menu_id].function, "setMultipleOption") == 0)
         {
@@ -288,7 +147,7 @@ public:
 
           output.clearScreen();
           
-          this->listChildren(this->current_menu_id); 
+          this->listItems(this->current_menu_id); 
         }
         else if(strcmp(items[this->active_menu_id].function, "selectRange") == 0)
         {
@@ -345,7 +204,7 @@ public:
     {
       input.action = "";
       
-      this->saveAlphanumericBufferToMyConfig();
+      this->saveAlphanumericBufferToEEPROM();
           
       //this->configSave();
       env = 0;
@@ -353,17 +212,18 @@ public:
 
       //input.action = "menu.enter";
       output.clearScreen();
-      this->listChildren(items[this->active_menu_id].parent_id); 
+      this->listItems(items[this->active_menu_id].parent_id); 
     }
     
     if(input.action == "menu.editor.cancel")
     {
       input.action = "";
       input.alphanumeric_buffer[0] = 0;
+      
       env = 0;
 
       output.clearScreen();
-      this->listChildren(items[this->active_menu_id].parent_id); 
+      this->listItems(items[this->active_menu_id].parent_id); 
     }
     if(input.action == "menu.editor.type")
     {
@@ -451,7 +311,7 @@ public:
       env = 0;
       this->current_menu_id = items[this->active_menu_id].parent_id;
       output.clearScreen();
-      this->listChildren(items[this->active_menu_id].parent_id); 
+      this->listItems(items[this->active_menu_id].parent_id); 
     }
     
     if(input.action == "menu.range.cancel")
@@ -462,10 +322,143 @@ public:
 
       this->current_menu_id = items[this->active_menu_id].parent_id;
       output.clearScreen();
-      this->listChildren(items[this->active_menu_id].parent_id); 
+      this->listItems(items[this->active_menu_id].parent_id); 
     }
   return;
   }
+
+  
+
+  void setCurrentMenuId(byte menu_id)
+  {
+    current_menu_id = menu_id;
+    return;
+  }
+
+  
+  void setSelectedMenuId(byte menu_id)
+  {
+    active_menu_id = menu_id;
+    this->changeSelection(true);
+    return;
+  }
+
+  
+  void listItems(byte parent_id)
+  {
+    //Set environment to children list
+    env = 0;
+
+    this->showTitle();
+
+    total = this->returnChildrenSize(parent_id);
+
+    byte n_items = this->returnChildrenSize(parent_id);
+    
+    byte children_items[n_items];
+
+    //build children_items array
+    byte j = 0;
+    byte active_index = 0;
+    for(byte i=0;i<sizeof items/sizeof items[0];i++)
+    {
+      if(items[i].parent_id == parent_id)
+      {
+        
+        if(active_menu_id == i) active_index = j;
+        
+        //if it's a placeholder parse it, otherwise load it into the children array
+        
+        children_items[j] = i;
+        j++;
+
+        
+      }
+      
+    }
+
+   current_page = floor(active_index/CONFIG_MENU_LINES);
+    for(byte i = current_page * CONFIG_MENU_LINES; i < CONFIG_MENU_LINES * (current_page+1); i++)
+    {
+      if(sizeof children_items / sizeof children_items[0] > i)
+      {
+        this->parseTitle(items[children_items[i]].title);
+        if(children_items[i] == active_menu_id)
+        {
+          output.printActiveLine(dest, this->checkSelected(children_items[i]));
+        }
+        else
+        {
+          output.printNormalLine(dest, this->checkSelected(children_items[i]));
+        }
+      }
+    }
+  }
+
+
+  void showTitle()
+  {
+    this->parseTitle(items[current_menu_id].title);
+    output.println(dest);
+    for(byte i=0;i<CONFIG_MENU_WIDTH;i++)
+      output.print("-");
+    output.println("");  
+  }
+
+
+  void parseTitle(char title[CONFIG_MENU_WIDTH])
+  {
+    String s;
+    char buf[CONFIG_MENU_WIDTH];
+    const char *placeholder = "%";
+    char value[16];
+    
+    s = String(title);
+        
+    for(byte i=0;i<sizeof items/sizeof items[0];i++)
+    {
+
+        buf[0] = 0;
+        itoa(i, value, 10);
+        strcpy(buf,placeholder);
+        strcat(buf,value);
+        strcat(buf,placeholder);
+
+        if(s.indexOf(buf)>=0)
+        {
+          EEPROM.get(i*CONFIG_MENU_WIDTH,EEPROMbuf);
+          s.replace(buf, EEPROMbuf);
+        }        
+    }
+    
+    if(s.length() == 0) s = CONFIG_MENU_EMPTY;
+
+    
+    //if(s.indexOf("v=")!=-1)
+
+    
+    for(byte j=0;j < CONFIG_MENU_WIDTH; j++)
+      dest[j] = s[j];      
+  }
+  
+  void changeSelection(bool direction)
+  {
+    byte n_items = sizeof items / sizeof items[0];
+    
+    
+      if(direction) this->active_menu_id++;
+      else this->active_menu_id--;
+      
+      if(this->active_menu_id <= 0) this->active_menu_id = n_items-1;
+      if(this->active_menu_id >= n_items) this->active_menu_id = 0;
+
+    if(items[this->active_menu_id].parent_id != this->current_menu_id)
+      this->changeSelection(direction);
+      
+
+  }
+
+
 
   void showRange(Range range)
   {
@@ -507,7 +500,7 @@ public:
     
     
   }
-  void saveAlphanumericBufferToMyConfig()
+  void saveAlphanumericBufferToEEPROM()
   {
     //char* c = EEPROMGet(this->active_menu_id);
         switch(env)
