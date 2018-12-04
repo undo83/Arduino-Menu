@@ -1,25 +1,32 @@
-#include <EEPROM.h>
-#include "globals.h";
-#include "output.h";
-#include "input.h";
-#include "menu.h";
+#include "Arduino.h"
+#include "Arduino_Menu.h";
 
+Arduino_Menu menu;
 
 void setup() {
-  output.setup();
-  
-  menu.EEPROMCheck();
-  //menu.EEPROMSaveDefault();
 
-  menu.setCurrentMenuId(0);
-  menu.setSelectedMenuId(0);
-  menu.listItems(menu.current_menu_id);
+  menu.setup();
+    
+  //change navigation pointer
+  menu.navChangeActive(1);
+  
+  //initialize output
+  menu.outputStart();
+    
+  //list menu items
+  menu.navListItems(menu.navGetCurrentMenuId());
+    
+  //finish output
+  menu.outputFinish();
 }
 
 void loop() {
 
-  input.listen();
-  menu.menuAnswer();
+  menu.inputListen();
+  
+  
+  
+  
 
   delay(100);
 }
