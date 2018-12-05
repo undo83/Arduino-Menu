@@ -313,11 +313,11 @@
   }
 
   /*********************************************************************************************************
-  * void controllerSelectRange()
+  * void Arduino_Menu::controllerSelectRange()
   * Description:              Select Range behavior function.
   *********************************************************************************************************/
   void Arduino_Menu::controllerSelectRange(){
-          
+     Serial.println(_incoming_byte);
      //set input back to 0
     _incoming_byte = 0;
     
@@ -411,7 +411,7 @@
     
     if(_env==AM_ENV_TYPE_NUMERIC){
       if(_alphanumeric_position < 0) 
-        _alphanumeric_position = strlen(AM_ENV_TYPE_NUMERIC)-1;
+        _alphanumeric_position = strlen(AM_INPUT_TYPE_NUMERIC)-1;
     }
     
     if(_env==AM_ENV_TYPE_ALPHANUM){
@@ -443,7 +443,7 @@
     }
         
     if(_env==AM_ENV_TYPE_NUMERIC){
-      if(_alphanumeric_position >= strlen(AM_ENV_TYPE_NUMERIC)) 
+      if(_alphanumeric_position >= strlen(AM_INPUT_TYPE_NUMERIC)) 
         _alphanumeric_position = 0;
     }
     
@@ -543,6 +543,8 @@
       
       //set the buffer back to null
       _alphanumeric_buffer[0] = 0;
+
+      _alphanumeric_position = 0;
       
       //set environment back to navigation
       _env = AM_ENV_NAV;

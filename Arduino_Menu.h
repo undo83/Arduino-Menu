@@ -23,7 +23,7 @@
 ** Description:             
 *********************************************************************************************************/
 #define AM_PLUGINS_SERIAL
-#define AM_PLUGINS_LIQUIDCRYSTAL
+//#define AM_PLUGINS_LIQUIDCRYSTAL
 #define AM_PLUGINS_OLED_SSD1306
 
 #define AM_ENV_STATES           4
