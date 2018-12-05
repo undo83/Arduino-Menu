@@ -85,9 +85,9 @@ void Arduino_Menu::outputPrintlnToSerial(String str){
 ** outputPrintItemToSerial(String title, bool selected, bool active)
 ** Description:             Print item to Serial
 *********************************************************************************************************/  
-void Arduino_Menu::outputPrintItemToSerial(String title, bool selected, bool active){
+void Arduino_Menu::outputPrintItemToSerial(String title, bool selected, bool active, bool line){
   if(active) outputPrintToSerial(">");  
   outputPrintToSerial(title);    
   if(selected) outputPrintToSerial("*");
-  outputPrintlnToSerial("");
+  if(line) outputPrintlnToSerial("");
 }

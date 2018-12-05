@@ -34,9 +34,10 @@
 #define AM_MENU_PLACEHOLDER     "%"
 #define AM_MENU_EMPTY           "Empty"
 #define AM_MENU_EDITOR_CURSOR   "_"
-#define AM_MENU_EDITOR_CONFIRM  "(e) Confirm "
-#define AM_MENU_EDITOR_CANCEL   "(c) Cancel "
+#define AM_MENU_EDITOR_CONFIRM  "Confirm "
+#define AM_MENU_EDITOR_CANCEL   "Cancel "
 #define AM_MENU_EDITOR_DELAY    2000
+#define AM_MENU_EDITOR_STYLE    0 /*0 - change letter using up/down arrows, right arrow moves to the next character; 1 - Use interval in which the same letter changes.*/
 
 #define AM_ENV_NAV              0
 #define AM_ENV_TYPE_ALPHANUM    1
@@ -50,21 +51,19 @@
 #define AM_INPUT_NAV_ENTER      3
 #define AM_INPUT_NAV_BACK       4
 
-#define AM_INPUT_EDIT_TYPE      1
-#define AM_INPUT_EDIT_CANCEL    2
-#define AM_INPUT_EDIT_DELETE    3
-#define AM_INPUT_EDIT_CONFIRM   4
+#define AM_INPUT_EDIT_TYPE_UP     1
+#define AM_INPUT_EDIT_TYPE_DOWN   2
+#define AM_INPUT_EDIT_TYPE_NEXT   3
+#define AM_INPUT_EDIT_TYPE_DELETE 4
+#define AM_INPUT_EDIT_CONFIRM     5
 
 #define AM_INPUT_RANGE_UP       1
 #define AM_INPUT_RANGE_DOWN     2
 #define AM_INPUT_RANGE_CANCEL   3
 #define AM_INPUT_RANGE_CONFIRM  4
 
-#define AM_INPUT_TYPE_0         ""
-#define AM_INPUT_TYPE_1         "abcdefghijklmnopqrstuvxyz0123456789"
-#define AM_INPUT_TYPE_2         "9876543210zyxvutsrqponmlkjihgfedcba"
-#define AM_INPUT_TYPE_3         "0123456789."
-#define AM_INPUT_TYPE_4         ".9876543210"
+#define AM_INPUT_TYPE_ALPHANUM  " abcdefghijklmnopqrstuvxyz0123456789."
+#define AM_INPUT_TYPE_NUMERIC   "0123456789."
 
 //define the default menu functions
 #define AM_ITEM_FUNCTION_LISTITEMS            1
@@ -114,10 +113,11 @@ private:
   uint8_t _total_items;
 
   //input variables
-  uint8_t _incoming_byte;
+  uint8_t _incoming_byte=0;
   Input _inputs[AM_INPUTS];
   char _alphanumeric_buffer[AM_MENU_WIDTH];
-  uint8_t _alphanumeric_position;
+  int8_t _alphanumeric_position=0;
+  int8_t _editor_env = 0;
   uint8_t _input_pin;
   unsigned long _timer = 0;
 
@@ -174,7 +174,7 @@ public:
 ** Description:             controller related functions
 *********************************************************************************************************/
   void controller();
-  void controllerNavUpDown(uint8_t direction);
+  void controllerNavUpDown(int8_t direction);
   void controllerNavBack();
   void controllerNavListItems();
   
@@ -184,9 +184,14 @@ public:
   void controllerSetAlphaNumeric();
 
   void controllerEditType();
+  void controllerEditTypeUp();
+  void controllerEditTypeDown();
   void controllerEditCancel();
+  void controllerEditTypeNext();
   void controllerEditDelete();
   void controllerEditConfirm();
+  void controllerEditShowType();
+  void controllerEditTypeChangeEnv(int8_t direction);
   
   void controllerEditRangeUp();
   void controllerEditRangeDown();
@@ -201,7 +206,7 @@ public:
   void outputFinish();
   void outputPrint(String str);
   void outputPrintln(String str);
-  void outputPrintItem(String title, bool selected, bool active);
+  void outputPrintItem(String title, bool selected, bool active, bool line);
   
   
   #if defined AM_PLUGINS_SERIAL 
@@ -209,7 +214,7 @@ public:
     void outputFinishToSerial();
     void outputPrintToSerial(String str);
     void outputPrintlnToSerial(String str);
-    void outputPrintItemToSerial(String title, bool selected, bool active);
+    void outputPrintItemToSerial(String title, bool selected, bool active, bool line);
   #endif
 
   #if defined AM_PLUGINS_LIQUIDCRYSTAL
@@ -217,7 +222,7 @@ public:
     void outputFinishToLiquidCrystal();
     void outputPrintToLiquidCrystal(String str);
     void outputPrintlnToLiquidCrystal(String str);
-    void outputPrintItemToLiquidCrystal(String title, bool selected, bool active);
+    void outputPrintItemToLiquidCrystal(String title, bool selected, bool active, bool line);
   #endif
   
   #if defined AM_PLUGINS_OLED_SSD1306
@@ -225,7 +230,7 @@ public:
     void outputFinishToOledSSD1306();
     void outputPrintToOledSSD1306(String str);
     void outputPrintlnToOledSSD1306(String str);
-    void outputPrintItemToOledSSD1306(String title, bool selected, bool active);
+    void outputPrintItemToOledSSD1306(String title, bool selected, bool active, bool line);
   #endif
   
 /*********************************************************************************************************
@@ -244,7 +249,7 @@ public:
 * 
 * 
 *********************************************************************************************************/
-  void navChangeActive(uint8_t direction);
+  void navChangeActive(int8_t direction);
   Item navGetItem(uint8_t id);
   void navSetTotalItems(uint8_t total);
   void navListItems(uint8_t parent_id);

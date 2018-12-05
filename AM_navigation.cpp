@@ -10,11 +10,11 @@
 *********************************************************************************************************/
 
   /*********************************************************************************************************
-  * navChangeActive(uint8_t direction)
+  * navChangeActive(int8_t direction)
   * Description:             Changes the _active_menu_id variable to the next item that has the same 
   *                          parent_id based on the direction(1 or -1).
   *********************************************************************************************************/
-  void Arduino_Menu::navChangeActive(uint8_t direction){
+  void Arduino_Menu::navChangeActive(int8_t direction){
     _active_menu_id = _active_menu_id + direction;
       
     if(_active_menu_id <= 0) _active_menu_id = _total_items-1;
@@ -157,7 +157,7 @@
       if(sizeof children_items / sizeof children_items[0] > i)
       {
         navParseTitle(navGetItem(children_items[i]).title);
-        outputPrintItem(_output_buffer, navCheckSelected(children_items[i]), navCheckActive(children_items[i]));
+        outputPrintItem(_output_buffer, navCheckSelected(children_items[i]), navCheckActive(children_items[i]), true);
         _current_row++;
       }
     }

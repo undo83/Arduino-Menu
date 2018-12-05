@@ -64,8 +64,9 @@
               controllerSelectRange();
             }
               /*                    SET_ALPHANUMERIC / NUMERIC          */
-            else if(navGetItem(_active_menu_id).function == AM_ITEM_FUNCTION_SET_ALPHANUMERIC || navGetItem(_active_menu_id).function == AM_ITEM_FUNCTION_SET_NUMERIC){
-              controllerSetAlphaNumeric();              
+            else if(navGetItem(_active_menu_id).function == AM_ITEM_FUNCTION_SET_ALPHANUMERIC || navGetItem(_active_menu_id).function == AM_ITEM_FUNCTION_SET_NUMERIC){              
+              controllerSetAlphaNumeric();      
+              controllerEditShowType();    
             }            
           break;
     
@@ -80,20 +81,69 @@
       case AM_ENV_TYPE_NUMERIC:
         
         switch(inputGet(_incoming_byte).beh[_env].action){
-          case AM_INPUT_EDIT_TYPE:            
-            controllerEditType();
+          
+          case AM_INPUT_EDIT_TYPE_UP:
+            switch(_editor_env){
+              case 0:
+              default:
+                controllerEditTypeUp();
+              break;
+              
+              case 1:           
+              case 2:
+                controllerEditTypeChangeEnv(-1);
+              break;
+            }            
+            controllerEditShowType();
+            
           break;
+          
+          case AM_INPUT_EDIT_TYPE_DOWN:
+            switch(_editor_env){
+              case 0:
+              default:
+                controllerEditTypeDown();
+              break;
+              
+              case 1:
+              case 2:
+                controllerEditTypeChangeEnv(1);
+              break;
+            }
+            controllerEditShowType();
+          break;  
+          
+          case AM_INPUT_EDIT_TYPE_NEXT:
+            controllerEditTypeNext();
+            controllerEditShowType();
+          break;          
 
-          case AM_INPUT_EDIT_CANCEL:   
-            controllerEditCancel();
-          break;
+          //case AM_INPUT_EDIT_CANCEL:   
+            //controllerEditCancel();
+          //break;
 
-          case AM_INPUT_EDIT_DELETE:            
+          case AM_INPUT_EDIT_TYPE_DELETE:            
             controllerEditDelete();
+            controllerEditShowType();
           break;
 
           case AM_INPUT_EDIT_CONFIRM:
-            controllerEditConfirm();
+            switch(_editor_env){
+                case 0:
+                default:
+                  controllerEditTypeChangeEnv(1);
+                  controllerEditShowType();
+                break;
+                
+                case 1:
+                  controllerEditConfirm();
+                break;
+                
+                case 2:
+                  controllerEditCancel();
+                break;
+              }
+            
           break;
                     
           default:
@@ -133,11 +183,11 @@
 
   
   /*********************************************************************************************************
-  * void controllerNavUpDown(uint8_t direction)
+  * void controllerNavUpDown(int8_t direction)
   * Description:              Navigation Up / Down controller function that moves the _active_menu_id up or down
   *                           one position
   *********************************************************************************************************/
-  void Arduino_Menu::controllerNavUpDown(uint8_t direction){    
+  void Arduino_Menu::controllerNavUpDown(int8_t direction){    
     
     //change navigation pointer
     navChangeActive(direction);
@@ -311,139 +361,131 @@
     
     for(byte i=0;i<AM_MENU_WIDTH;i++)
       _alphanumeric_buffer[i] = _output_buffer[i];
-
+    
+    _editor_env = 0;
+    
+  }
+  /*********************************************************************************************************
+  * void Arduino_Menu::controllerEditShowType()
+  * Description:              Alphanumeric and Numeric type editor behavior function.
+  *********************************************************************************************************/
+  void Arduino_Menu::controllerEditShowType(){    
+    
     navShowTitle();
 
     //initialize output
     outputStart(); 
   
-    outputPrint(_alphanumeric_buffer);
-    outputPrintln(AM_MENU_EDITOR_CURSOR);
-    
-    outputPrint(AM_MENU_EDITOR_CONFIRM);
-    outputPrintln(AM_MENU_EDITOR_CANCEL);
+    if(_editor_env == 0) outputPrintItem(_alphanumeric_buffer + String(AM_MENU_EDITOR_CURSOR), false, true, true);
+    else outputPrintItem(_alphanumeric_buffer, false, false, true);
+
+    if(_editor_env == 1)
+      outputPrintItem(AM_MENU_EDITOR_CONFIRM, false, true, false);
+    else 
+      outputPrintItem(AM_MENU_EDITOR_CONFIRM, false, false, false);
+
+    if(_editor_env == 2)
+      outputPrintItem(AM_MENU_EDITOR_CANCEL, false, true, true);
+    else 
+      outputPrintItem(AM_MENU_EDITOR_CANCEL, false, false, true);
     
     //finish output
     outputFinish();  
   }
+  /*********************************************************************************************************
+  * void Arduino_Menu::controllerEditTypeUp()
+  * Description:              Previous alphanumeric character
+  *********************************************************************************************************/
+  void Arduino_Menu::controllerEditTypeUp() {
+
+    Serial.println(_incoming_byte);
+    
+    _incoming_byte = 0;
+    
+    _alphanumeric_position --;
+    
+    if(_env==AM_ENV_TYPE_ALPHANUM){          
+      if(_alphanumeric_position < 0) 
+        _alphanumeric_position = strlen(AM_INPUT_TYPE_ALPHANUM)-1;
+    }
+    
+    if(_env==AM_ENV_TYPE_NUMERIC){
+      if(_alphanumeric_position < 0) 
+        _alphanumeric_position = strlen(AM_ENV_TYPE_NUMERIC)-1;
+    }
+    
+    if(_env==AM_ENV_TYPE_ALPHANUM){
+      _alphanumeric_buffer[strlen(_alphanumeric_buffer)-1] = AM_INPUT_TYPE_ALPHANUM[_alphanumeric_position];        
+      _alphanumeric_buffer[strlen(_alphanumeric_buffer)] = 0;      
+    }
+    
+    if(_env==AM_ENV_TYPE_NUMERIC){
+      _alphanumeric_buffer[strlen(_alphanumeric_buffer)-1] = AM_INPUT_TYPE_NUMERIC[_alphanumeric_position];        
+      _alphanumeric_buffer[strlen(_alphanumeric_buffer)] = 0;
+    }
+    
+    //if(_alphanumeric_position > 0)
+
+  }
+  /*********************************************************************************************************
+  * void controllerEditTypeDown()
+  * Description:              Next alphanumeric character
+  *********************************************************************************************************/
+  void Arduino_Menu::controllerEditTypeDown() {
+        
+    _incoming_byte = 0;
+    
+    _alphanumeric_position++;
+    
+    if(_env==AM_ENV_TYPE_ALPHANUM){
+      if(_alphanumeric_position >= strlen(AM_INPUT_TYPE_ALPHANUM)) 
+        _alphanumeric_position = 0;
+    }
+        
+    if(_env==AM_ENV_TYPE_NUMERIC){
+      if(_alphanumeric_position >= strlen(AM_ENV_TYPE_NUMERIC)) 
+        _alphanumeric_position = 0;
+    }
+    
+    if(_env==AM_ENV_TYPE_ALPHANUM){
+      _alphanumeric_buffer[strlen(_alphanumeric_buffer)-1] = AM_INPUT_TYPE_ALPHANUM[_alphanumeric_position];        
+      _alphanumeric_buffer[strlen(_alphanumeric_buffer)] = 0;      
+    }
+    
+    if(_env==AM_ENV_TYPE_NUMERIC){
+      _alphanumeric_buffer[strlen(_alphanumeric_buffer)-1] = AM_INPUT_TYPE_NUMERIC[_alphanumeric_position];        
+      _alphanumeric_buffer[strlen(_alphanumeric_buffer)] = 0;
+    }
+    
+    
+
+  }
   
   /*********************************************************************************************************
-  * void controllerEditType()
+  * void controllerEditTypeNext()
+  * Description:              Increase buffer with one character
+  *********************************************************************************************************/
+  void Arduino_Menu::controllerEditTypeNext(){
+
+    if(strlen(_alphanumeric_buffer) < AM_MENU_WIDTH) {
+        _alphanumeric_position = 0; 
+        _alphanumeric_buffer[strlen(_alphanumeric_buffer)] = ' ';
+        _alphanumeric_buffer[strlen(_alphanumeric_buffer)+1] = '\0';
+    }
+    //controllerEditShowType();
+  }
+  /*********************************************************************************************************
+  * void controllerEditTypeChangeEnv(int8_t direction)
   * Description:              Alphanumeric and Numeric type editor behavior function.
   *********************************************************************************************************/
-  void Arduino_Menu::controllerEditType()
-  {    
-    uint8_t last_char = strlen(_alphanumeric_buffer);
+  void Arduino_Menu::controllerEditTypeChangeEnv(int8_t direction) {
     
-    if(last_char < AM_MENU_WIDTH) {
-      //if we repeat the last input
-      if(_incoming_byte != _input_pin){                       
-        _alphanumeric_position = 0; 
-        _alphanumeric_buffer[last_char] = ' ';
-        _alphanumeric_buffer[last_char+1] = '\0';
-      }
-      else {
-        if(millis() - _timer > AM_MENU_EDITOR_DELAY)
-        {            
-          _alphanumeric_position = 0; 
-          _alphanumeric_buffer[last_char] = ' ';
-          _alphanumeric_buffer[last_char+1] = '\0';
-        }
-        _timer = millis();
-      }
-      _input_pin = _incoming_byte;
-
-         
-      //set input back to 0
-      _incoming_byte = 0;
-      
-      //alphanumeric
-      if(_env==AM_ENV_TYPE_ALPHANUM)
-      { 
-        char * ch;
-        if(last_char < AM_MENU_WIDTH){
-        switch(inputGet(_input_pin).beh[_env].sequence){
-          case 0: default: ch = AM_INPUT_TYPE_0;break;
-          case 1: ch = AM_INPUT_TYPE_1;break;
-          case 2: ch = AM_INPUT_TYPE_1;break;
-          case 3: ch = AM_INPUT_TYPE_1;break;
-          case 4: ch = AM_INPUT_TYPE_1;break;          
-        }
-
-        if(_alphanumeric_position >= strlen(ch))
-          _alphanumeric_position = 0;
-
-        _alphanumeric_buffer[last_char-1] = ch[_alphanumeric_position];        
-        _alphanumeric_buffer[last_char] = 0;
-            
-        _alphanumeric_position++;
-        }
-      }
-      //numeric
-      if(_env==AM_ENV_TYPE_NUMERIC)
-      {
-        char * ch;
-        if(last_char < AM_MENU_WIDTH)
-        {
-          
-          switch(inputGet(_input_pin).beh[_env].sequence){
-            case 0: default: ch = AM_INPUT_TYPE_0;break;
-            case 1: ch = AM_INPUT_TYPE_1;break;
-            case 2: ch = AM_INPUT_TYPE_1;break;
-            case 3: ch = AM_INPUT_TYPE_1;break;
-            case 4: ch = AM_INPUT_TYPE_1;break;          
-          }
-          //find the used input            
-          if(_alphanumeric_position>strlen(ch)) {
-            _alphanumeric_position = 0;
-          }
-    
-              
-          uint8_t cycle = 0;
-          while(String(ch[_alphanumeric_position]).toInt()==0 && ch[_alphanumeric_position] != '0' && cycle < 2)
-          {
-            _alphanumeric_position++;
-            if(_alphanumeric_position>strlen(ch))
-            {
-              _alphanumeric_position = 0;
-              cycle++;
-            }
-          }
-
-          if(ch[_alphanumeric_position] == '0' || String(ch[_alphanumeric_position]).toInt()!=0)
-          {
-            if(_alphanumeric_buffer[last_char-1]==ch[_alphanumeric_position])
-            {
-              _alphanumeric_buffer[last_char] = ch[_alphanumeric_position];
-              _alphanumeric_buffer[last_char+1] = '\0';
-            }
-            else
-            {
-              _alphanumeric_buffer[last_char-1] = ch[_alphanumeric_position];        
-              _alphanumeric_buffer[last_char] = '\0';
-            }
-          }
-        }
-      }
-    }
-    else
       _incoming_byte = 0;
 
-    
+      _editor_env += direction;
 
-    navShowTitle();
-
-    //initialize output
-    outputStart(); 
-  
-    outputPrint(_alphanumeric_buffer);
-    outputPrintln(AM_MENU_EDITOR_CURSOR);
-    
-    outputPrint(AM_MENU_EDITOR_CONFIRM);
-    outputPrintln(AM_MENU_EDITOR_CANCEL);
-    
-    //finish output
-    outputFinish();  
+      if(_editor_env < 0) _editor_env = 2;
+      if(_editor_env > 2) _editor_env = 0;
   }
   
   /*********************************************************************************************************
@@ -477,27 +519,12 @@
     //set input back to 0
     _incoming_byte = 0;
     
-    byte last_char = strlen(_alphanumeric_buffer)-1;
+    uint8_t last_char = strlen(_alphanumeric_buffer)-1;
     _alphanumeric_buffer[last_char] = '\0';
-       
-    //initialize output
-    outputStart();   
-    
-    //show menu title
-    navShowTitle();
-  
-    outputPrint(_alphanumeric_buffer);
-    outputPrintln(AM_MENU_EDITOR_CURSOR);
-    
-    outputPrint(AM_MENU_EDITOR_CONFIRM);
-    outputPrintln(AM_MENU_EDITOR_CANCEL);
-    
-    //finish output
-    outputFinish();
   }
   
   /*********************************************************************************************************
-  * void controllerEditConfirm()
+  * void Arduino_Menu::controllerEditConfirm()
   * Description:              Confirm save action for the alphanumeric editor
   *********************************************************************************************************/     
   void Arduino_Menu::controllerEditConfirm(){
@@ -505,23 +532,34 @@
     //set input back to 0
     _incoming_byte = 0;
 
-    //save the value to the EEPROM memory
-    EEPROM.put(AM_MENU_WIDTH * _active_menu_id, _alphanumeric_buffer);
+    //_editor_env++;
+    
+    if(_editor_env == 1){
+      
+      _editor_env = 0;
+    
+      //save the value to the EEPROM memory
+      EEPROM.put(AM_MENU_WIDTH * _active_menu_id, _alphanumeric_buffer);  
+      
+      //set the buffer back to null
+      _alphanumeric_buffer[0] = 0;
+      
+      //set environment back to navigation
+      _env = AM_ENV_NAV;
+      
+      //initialize output
+      outputStart();
+      
+      //list menu items
+      navListItems(navGetItem(_active_menu_id).parent_id);
+      
+      //finish output
+      outputFinish();
+    }
+    
 
-    //set the buffer back to null
-    _alphanumeric_buffer[0] = 0;
     
-    //set environment back to navigation
-    _env = AM_ENV_NAV;
     
-    //initialize output
-    outputStart();
-    
-    //list menu items
-    navListItems(navGetItem(_active_menu_id).parent_id);
-    
-    //finish output
-    outputFinish();
   }
             
   /*********************************************************************************************************

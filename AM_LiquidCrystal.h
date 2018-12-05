@@ -76,9 +76,9 @@ void Arduino_Menu::outputPrintlnToLiquidCrystal(String str){
 ** outputPrintItemToLiquidCrystal(String title, bool selected, bool active)
 ** Description:             Print item to Serial
 *********************************************************************************************************/  
-void Arduino_Menu::outputPrintItemToLiquidCrystal(String title, bool selected, bool active){
+void Arduino_Menu::outputPrintItemToLiquidCrystal(String title, bool selected, bool active, bool line){
   if(active) outputPrintToLiquidCrystal(">");  
   outputPrintToLiquidCrystal(title);    
   if(selected) outputPrintToLiquidCrystal("*");
-  outputPrintlnToLiquidCrystal("");
+  if(line) outputPrintlnToLiquidCrystal("");
 }

@@ -90,17 +90,17 @@
   ** outputPrintItem(String title, bool selected, bool active)
   ** Description:             Some outputs require actions to be performed at the end.
   *********************************************************************************************************/
-  void Arduino_Menu::outputPrintItem(String title, bool selected, bool active){
+  void Arduino_Menu::outputPrintItem(String title, bool selected, bool active, bool line){
     
     #if defined AM_PLUGINS_SERIAL
-      outputPrintItemToSerial(title, selected, active);
+      outputPrintItemToSerial(title, selected, active, line);
     #endif
     
     #if defined AM_PLUGINS_LIQUIDCRYSTAL
-      outputPrintItemToLiquidCrystal(title, selected, active);
+      outputPrintItemToLiquidCrystal(title, selected, active, line);
     #endif
   
     #if defined AM_PLUGINS_OLED_SSD1306
-      outputPrintItemToOledSSD1306(title, selected, active);
+      outputPrintItemToOledSSD1306(title, selected, active, line);
     #endif
   }
