@@ -317,7 +317,7 @@
   * Description:              Select Range behavior function.
   *********************************************************************************************************/
   void Arduino_Menu::controllerSelectRange(){
-     Serial.println(_incoming_byte);
+     
      //set input back to 0
     _incoming_byte = 0;
     

@@ -18,6 +18,12 @@
 #if defined AM_PLUGINS_OLED_SSD1306
   #include "AM_OledSSD1306.h"
 #endif
+#if defined AM_PLUGINS_UCGLIB
+  #include "AM_Ucglib.h"
+#endif
+#if defined AM_PLUGINS_TFT
+  #include "AM_TFT.h"
+#endif
 
 
 Arduino_Menu::Arduino_Menu() {

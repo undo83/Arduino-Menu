@@ -58,29 +58,13 @@ void Arduino_Menu::outputFinishToOledSSD1306(){
 }
 
 /*********************************************************************************************************
-** outputPrintToSerial(String str)
-** Description:             Print string to OLED SSD 1306
-*********************************************************************************************************/  
-void Arduino_Menu::outputPrintToOledSSD1306(String str){
-  display.print(str);
-}
-
-/*********************************************************************************************************
-** outputPrintlnToSerial(String str)
-** Description:            Println string to OLED SSD 1306
-*********************************************************************************************************/  
-void Arduino_Menu::outputPrintlnToOledSSD1306(String str){
-  display.println(str);
-}
-
-/*********************************************************************************************************
 ** outputPrintItemToOledSSD1306(String title, bool selected, bool active)
 ** Description:             Print item to OLED SSD 1306
 *********************************************************************************************************/  
 void Arduino_Menu::outputPrintItemToOledSSD1306(String title, bool selected, bool active, bool line){
   if(active) display.setTextColor(BLACK,WHITE);
-  outputPrintToOledSSD1306(title);    
-  if(selected) outputPrintToOledSSD1306("*");
+  display.print(title);    
+  if(selected) display.print("*");
   display.setTextColor(WHITE,BLACK);
-  if(line) outputPrintlnToOledSSD1306("");
+  if(line) display.println("");
 }

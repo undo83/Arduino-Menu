@@ -19,7 +19,7 @@
     EEPROM.get(0, _EEPROMbuf);
     if(strcmp(_EEPROMbuf, "init") != 0)
     { 
-      outputPrintln("Not initialized. Initializing now...");       
+      
       EEPROMSaveDefault();      
     }    
   }

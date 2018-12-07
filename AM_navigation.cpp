@@ -72,13 +72,17 @@
   void Arduino_Menu::navShowTitle(){
     
     navParseTitle(navGetItem(_current_menu_id).title);
-    
-    outputPrintln(_output_buffer);
+
+    outputPrintItem(_output_buffer, false, false, true);
+
+    char ch[AM_MENU_WIDTH];
     
     for(uint8_t i=0;i<AM_MENU_WIDTH;i++)
-      outputPrint("-");
+      ch[i] = '-';
+    ch[AM_MENU_WIDTH] = '\0';
+    
+    outputPrintItem(ch, false, false, true);
       
-    outputPrintln("");
   }
 
   /*********************************************************************************************************

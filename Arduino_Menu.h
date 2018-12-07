@@ -24,13 +24,16 @@
 *********************************************************************************************************/
 #define AM_PLUGINS_SERIAL
 //#define AM_PLUGINS_LIQUIDCRYSTAL
-#define AM_PLUGINS_OLED_SSD1306
+//#define AM_PLUGINS_OLED_SSD1306
+//#define AM_PLUGINS_UCGLIB
+#define AM_PLUGINS_TFT
+
 
 #define AM_ENV_STATES           4
 #define AM_INPUTS               5
 #define AM_INPUT_PRESS_MILLIS   200
 #define AM_MENU_WIDTH           20
-#define AM_MENU_LINES           2
+#define AM_MENU_LINES           4
 #define AM_MENU_PLACEHOLDER     "%"
 #define AM_MENU_EMPTY           "Empty"
 #define AM_MENU_EDITOR_CURSOR   "_"
@@ -103,7 +106,7 @@ class Arduino_Menu {
   
 
 
-private:
+private:  
   //environment variables
   uint8_t _env;  
 
@@ -120,6 +123,7 @@ private:
   int8_t _editor_env = 0;
   uint8_t _input_pin;
   unsigned long _timer = 0;
+  uint8_t _line = 0;
 
   //output variables  
   char _output_buffer[AM_MENU_WIDTH];
@@ -150,6 +154,14 @@ public:
 
   #if defined AM_PLUGINS_OLED_SSD1306
     void setupOledSSD1306();
+  #endif
+
+  #if defined AM_PLUGINS_UCGLIB
+    void setupUcglib();
+  #endif
+
+  #if defined AM_PLUGINS_TFT
+    void setupTFT();
   #endif
 /*********************************************************************************************************
 **                          Input functions
@@ -204,33 +216,37 @@ public:
 *********************************************************************************************************/
   void outputStart();
   void outputFinish();
-  void outputPrint(String str);
-  void outputPrintln(String str);
   void outputPrintItem(String title, bool selected, bool active, bool line);
   
   
   #if defined AM_PLUGINS_SERIAL 
     void outputStartToSerial();
     void outputFinishToSerial();
-    void outputPrintToSerial(String str);
-    void outputPrintlnToSerial(String str);
     void outputPrintItemToSerial(String title, bool selected, bool active, bool line);
   #endif
 
   #if defined AM_PLUGINS_LIQUIDCRYSTAL
     void outputStartToLiquidCrystal();
     void outputFinishToLiquidCrystal();
-    void outputPrintToLiquidCrystal(String str);
-    void outputPrintlnToLiquidCrystal(String str);
     void outputPrintItemToLiquidCrystal(String title, bool selected, bool active, bool line);
   #endif
   
   #if defined AM_PLUGINS_OLED_SSD1306
     void outputStartToOledSSD1306();
     void outputFinishToOledSSD1306();
-    void outputPrintToOledSSD1306(String str);
-    void outputPrintlnToOledSSD1306(String str);
     void outputPrintItemToOledSSD1306(String title, bool selected, bool active, bool line);
+  #endif
+
+  #if defined AM_PLUGINS_UCGLIB
+    void outputStartToUcglib();
+    void outputFinishToUcglib();
+    void outputPrintItemToUcglib(String title, bool selected, bool active, bool line);    
+  #endif
+
+  #if defined AM_PLUGINS_TFT
+    void outputStartToTFT();
+    void outputFinishToTFT();
+    void outputPrintItemToTFT(String title, bool selected, bool active, bool line);    
   #endif
   
 /*********************************************************************************************************

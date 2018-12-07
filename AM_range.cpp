@@ -35,27 +35,27 @@
   void Arduino_Menu::rangeShow(Range range)
   {    
     float percent = 0;
-    
+        
     _env = AM_ENV_RANGE;
 
     navShowTitle();
     
-    percent = range.v * (AM_MENU_WIDTH-2)/(range.M-range.m);
+    percent = range.v * (AM_MENU_WIDTH-3)/(range.M-range.m);
     
-    for(uint8_t i=0; i<(AM_MENU_WIDTH - String(range.v).length())/2;i++)
-    {
-      outputPrint(" ");        
-    }
-    outputPrintln(String(range.v));
+    outputPrintItem(String(range.v), false, false, true);
+
+    char ch[AM_MENU_WIDTH];
+        
+    ch[0] = '[';
     
-    outputPrint("[");
-    
-    for(uint8_t i=0;i<AM_MENU_WIDTH-2;i++)
+    for(uint8_t i=0;i<AM_MENU_WIDTH-3;i++)
     {
       if( i < percent )
-        outputPrint("=");
+        ch[i+1] = '=';
       else 
-        outputPrint(" ");
+        ch[i+1] = ' ';
     }
-    outputPrint("]");
+    ch[AM_MENU_WIDTH-2] = ']';
+    ch[AM_MENU_WIDTH-1] = '\0';
+    outputPrintItem(ch, false, false, true);
   }

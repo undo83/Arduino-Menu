@@ -9,17 +9,25 @@
 * 
 *********************************************************************************************************/ 
 void Arduino_Menu::setup(){
-
+  
   #if defined AM_PLUGINS_SERIAL 
     setupSerial(); 
+  #endif
+
+  #if defined AM_PLUGINS_LIQUIDCRYSTAL
+    setupLiquidCrystal();
   #endif
 
   #if defined AM_PLUGINS_OLED_SSD1306
     setupOledSSD1306();
   #endif
 
-  #if defined AM_PLUGINS_LIQUIDCRYSTAL
-    setupLiquidCrystal();
+  #if defined AM_PLUGINS_UCGLIB
+    setupUcglib();
+  #endif
+
+  #if defined AM_PLUGINS_TFT
+    setupTFT();
   #endif
 
   EEPROMCheck();

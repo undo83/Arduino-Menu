@@ -52,33 +52,13 @@ void Arduino_Menu::outputFinishToLiquidCrystal(){
 }
 
 /*********************************************************************************************************
-** outputPrintToLiquidCrystal(String str)
-** Description:             Serial print string
-*********************************************************************************************************/  
-void Arduino_Menu::outputPrintToLiquidCrystal(String str){
-  lcd.print(str);
-}
-
-/*********************************************************************************************************
-** outputPrintlnToSerial(String str)
-** Description:             Serial println string
-*********************************************************************************************************/  
-void Arduino_Menu::outputPrintlnToLiquidCrystal(String str){
-  lcd.print(str);
-  
-  if(_current_row<AM_MENU_LINES) 
-    lcd.setCursor(0,_current_row);
-  //else
-    //_current_row = 0;
-}
-
-/*********************************************************************************************************
 ** outputPrintItemToLiquidCrystal(String title, bool selected, bool active)
 ** Description:             Print item to Serial
 *********************************************************************************************************/  
 void Arduino_Menu::outputPrintItemToLiquidCrystal(String title, bool selected, bool active, bool line){
-  if(active) outputPrintToLiquidCrystal(">");  
-  outputPrintToLiquidCrystal(title);    
-  if(selected) outputPrintToLiquidCrystal("*");
-  if(line) outputPrintlnToLiquidCrystal("");
+  if(active) lcd.print(">");  
+  lcd.print(title);    
+  if(selected) lcd.print("*");
+  if(line) 
+    lcd.setCursor(0,_line);
 }
