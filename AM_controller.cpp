@@ -22,7 +22,9 @@
       /*                    AM_ENV_NAV            */
       case AM_ENV_NAV:
       default:
-        switch(inputGet(_incoming_byte).beh[_env].action)
+      //Serial.println(inputGet(_incoming_byte).action[_env]);
+      
+        switch(inputGet(_incoming_byte).action[_env])
         {
           /*                    CANCEL            */
           case AM_INPUT_NAV_BACK:
@@ -40,7 +42,7 @@
 
           /*                    ENTER            */
           case AM_INPUT_NAV_ENTER:
-          
+            
               /*                    LIST ITEMS            */
             if(navGetItem(_active_menu_id).function == AM_ITEM_FUNCTION_LISTITEMS){
               controllerNavListItems();
@@ -71,7 +73,7 @@
           break;
     
           default:
-            _incoming_byte = 0;
+            //_incoming_byte = 0;
           break;
         }
       break;
@@ -80,7 +82,7 @@
       case AM_ENV_TYPE_ALPHANUM:
       case AM_ENV_TYPE_NUMERIC:
         
-        switch(inputGet(_incoming_byte).beh[_env].action){
+        switch(inputGet(_incoming_byte).action[_env]){
           
           case AM_INPUT_EDIT_TYPE_UP:
             switch(_editor_env){
@@ -147,14 +149,14 @@
           break;
                     
           default:
-            _incoming_byte = 0;
+            //_incoming_byte = 0;
           break;
         }
       break;
       
       /*                    AM_ENV_RANGE            */
       case AM_ENV_RANGE:
-        switch(inputGet(_incoming_byte).beh[_env].action){
+        switch(inputGet(_incoming_byte).action[_env]){
           case AM_INPUT_RANGE_UP:            
             controllerEditRangeUp();
           break;
@@ -172,7 +174,7 @@
           break;
           
           default:
-            _incoming_byte = 0;
+            //_incoming_byte = 0;
           break;
         }
       break;
@@ -330,6 +332,7 @@
     //initialize output
     outputStart();    
 
+    outputClear();
     //display the range screen
     rangeShow(_r);
     

@@ -29,11 +29,10 @@
 #define AM_PLUGINS_TFT
 
 
-#define AM_ENV_STATES           4
 #define AM_INPUTS               5
 #define AM_INPUT_PRESS_MILLIS   200
 #define AM_MENU_WIDTH           20
-#define AM_MENU_LINES           4
+#define AM_MENU_LINES           6
 #define AM_MENU_PLACEHOLDER     "%"
 #define AM_MENU_EMPTY           "Empty"
 #define AM_MENU_EDITOR_CURSOR   "_"
@@ -42,6 +41,7 @@
 #define AM_MENU_EDITOR_DELAY    2000
 #define AM_MENU_EDITOR_STYLE    0 /*0 - change letter using up/down arrows, right arrow moves to the next character; 1 - Use interval in which the same letter changes.*/
 
+#define AM_ENV_STATES           4
 #define AM_ENV_NAV              0
 #define AM_ENV_TYPE_ALPHANUM    1
 #define AM_ENV_TYPE_NUMERIC     2
@@ -80,14 +80,9 @@
 //define the custom menu functions
 #define AM_ITEM_FUNCTION_START_CYCLE          8
 
-typedef struct {
-  uint8_t action;
-  uint8_t sequence; 
-} Behavior;
-
 typedef struct {  
   uint8_t id;
-  Behavior beh[AM_ENV_STATES];
+  uint8_t action[AM_ENV_STATES];
 } Input;
 
 typedef struct {
@@ -101,6 +96,7 @@ typedef struct
 {
   float v,m,M,s;
 } Range;
+
 
 class Arduino_Menu {
   
@@ -168,7 +164,7 @@ public:
 ** Description:             Input related functions
 *********************************************************************************************************/
   void inputListen();
-  void inputSetBehavior(uint8_t index, uint8_t env, uint8_t action, uint8_t sequence);
+  void inputSetAction(uint8_t index, uint8_t env, uint8_t action);
   void inputSetId(uint8_t index, uint8_t id);
   Input inputGet(uint8_t id);
   
@@ -217,36 +213,47 @@ public:
   void outputStart();
   void outputFinish();
   void outputPrintItem(String title, bool selected, bool active, bool line);
+  void outputPrintTitle(String title);
+  void outputClear();
   
   
   #if defined AM_PLUGINS_SERIAL 
     void outputStartToSerial();
     void outputFinishToSerial();
     void outputPrintItemToSerial(String title, bool selected, bool active, bool line);
+    void outputPrintTitleToSerial(String title);
+    void outputPrintProgress(float value, float max);
+    
   #endif
 
   #if defined AM_PLUGINS_LIQUIDCRYSTAL
     void outputStartToLiquidCrystal();
     void outputFinishToLiquidCrystal();
     void outputPrintItemToLiquidCrystal(String title, bool selected, bool active, bool line);
+    void outputPrintTitleToLiquidCrystal(String title);
   #endif
   
   #if defined AM_PLUGINS_OLED_SSD1306
     void outputStartToOledSSD1306();
     void outputFinishToOledSSD1306();
     void outputPrintItemToOledSSD1306(String title, bool selected, bool active, bool line);
+    void outputPrintTitleToOledSSD1306(String title);
   #endif
 
   #if defined AM_PLUGINS_UCGLIB
     void outputStartToUcglib();
     void outputFinishToUcglib();
-    void outputPrintItemToUcglib(String title, bool selected, bool active, bool line);    
+    void outputPrintItemToUcglib(String title, bool selected, bool active, bool line);
+    void outputPrintTitleToUcglib(String title);
   #endif
 
   #if defined AM_PLUGINS_TFT
     void outputStartToTFT();
     void outputFinishToTFT();
-    void outputPrintItemToTFT(String title, bool selected, bool active, bool line);    
+    void outputPrintItemToTFT(String title, bool selected, bool active, bool line);
+    void outputPrintTitleToTFT(String title);
+    void outputPrintProgressToTFT(float value, float max);
+    void outputClearToTFT();
   #endif
   
 /*********************************************************************************************************

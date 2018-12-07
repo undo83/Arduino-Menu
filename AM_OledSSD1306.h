@@ -68,3 +68,13 @@ void Arduino_Menu::outputPrintItemToOledSSD1306(String title, bool selected, boo
   display.setTextColor(WHITE,BLACK);
   if(line) display.println("");
 }
+
+/*********************************************************************************************************
+** outputPrintTitleToOledSSD1306(String title)
+** Description:             Print title to OLED SSD 1306
+*********************************************************************************************************/  
+void Arduino_Menu::outputPrintTitleToOledSSD1306(String title){
+  display.setTextColor(BLACK,WHITE);
+  display.print(title);      
+  display.setTextColor(WHITE,BLACK);
+}

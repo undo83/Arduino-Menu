@@ -25,14 +25,19 @@ void Arduino_Menu::setupSerial(){
 uint8_t Arduino_Menu::inputListenFromSerial(){
   uint8_t incoming = 0;
   if (Serial.available() > 0) {
-    delay(30);
+    
     incoming = Serial.read();
+    delay(30);
   }
   
   if(incoming!=0){
     for(uint8_t i = 0; i< sizeof _inputs / sizeof _inputs[0]; i++){
       if(incoming == _inputs[i].id)
+      {
+        Serial.print("found ");
+        Serial.println(incoming);
         return incoming;
+      }
     }    
   }
   return 0;
@@ -76,4 +81,16 @@ void Arduino_Menu::outputPrintItemToSerial(String title, bool selected, bool act
   Serial.print(title);
   if(selected) Serial.print("*");
   if(line) Serial.println("");
+}
+
+/*********************************************************************************************************
+** outputPrintTitleToSerial(String title)
+** Description:             Print title to Serial
+*********************************************************************************************************/  
+void Arduino_Menu::outputPrintTitleToSerial(String title){
+  
+  Serial.println(title);
+  for(uint8_t i=0;i<AM_MENU_WIDTH;i++)
+    Serial.print("-");
+  Serial.println();  
 }

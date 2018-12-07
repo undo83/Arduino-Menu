@@ -36,38 +36,38 @@ void Arduino_Menu::setup(){
   /* Set default input behaviors */
   /*up*/
   inputSetId(0, 97);
-  inputSetBehavior(0, AM_ENV_NAV, AM_INPUT_NAV_UP, 0);
-  inputSetBehavior(0, AM_ENV_TYPE_ALPHANUM, AM_INPUT_EDIT_TYPE_UP, 1);
-  inputSetBehavior(0, AM_ENV_TYPE_NUMERIC, AM_INPUT_EDIT_TYPE_UP,3);
-  inputSetBehavior(0, AM_ENV_RANGE, AM_INPUT_RANGE_UP, 0);
+  inputSetAction(0, AM_ENV_NAV, AM_INPUT_NAV_UP);
+  inputSetAction(0, AM_ENV_TYPE_ALPHANUM, AM_INPUT_EDIT_TYPE_UP);
+  inputSetAction(0, AM_ENV_TYPE_NUMERIC, AM_INPUT_EDIT_TYPE_UP);
+  inputSetAction(0, AM_ENV_RANGE, AM_INPUT_RANGE_UP);
   
   /*down*/
   inputSetId(1, 122);
-  inputSetBehavior(1, AM_ENV_NAV, AM_INPUT_NAV_DOWN, 0);
-  inputSetBehavior(1, AM_ENV_TYPE_ALPHANUM, AM_INPUT_EDIT_TYPE_DOWN, 2);
-  inputSetBehavior(1, AM_ENV_TYPE_NUMERIC, AM_INPUT_EDIT_TYPE_DOWN, 4);
-  inputSetBehavior(1, AM_ENV_RANGE, AM_INPUT_RANGE_DOWN, 0);
+  inputSetAction(1, AM_ENV_NAV, AM_INPUT_NAV_DOWN);
+  inputSetAction(1, AM_ENV_TYPE_ALPHANUM, AM_INPUT_EDIT_TYPE_DOWN);
+  inputSetAction(1, AM_ENV_TYPE_NUMERIC, AM_INPUT_EDIT_TYPE_DOWN);
+  inputSetAction(1, AM_ENV_RANGE, AM_INPUT_RANGE_DOWN);
   
   /*left*/
   inputSetId(2, 99);
-  inputSetBehavior(2, AM_ENV_NAV, AM_INPUT_NAV_BACK, 0);
-  inputSetBehavior(2, AM_ENV_TYPE_ALPHANUM, AM_INPUT_EDIT_TYPE_DELETE, 0);
-  inputSetBehavior(2, AM_ENV_TYPE_NUMERIC, AM_INPUT_EDIT_TYPE_DELETE, 0);
-  inputSetBehavior(2, AM_ENV_RANGE, AM_INPUT_RANGE_CANCEL, 0);
+  inputSetAction(2, AM_ENV_NAV, AM_INPUT_NAV_BACK);
+  inputSetAction(2, AM_ENV_TYPE_ALPHANUM, AM_INPUT_EDIT_TYPE_DELETE);
+  inputSetAction(2, AM_ENV_TYPE_NUMERIC, AM_INPUT_EDIT_TYPE_DELETE);
+  inputSetAction(2, AM_ENV_RANGE, AM_INPUT_RANGE_CANCEL);
   
   /*right*/
   inputSetId(3, 114);
-  inputSetBehavior(3, AM_ENV_NAV, AM_INPUT_NULL, 0);
-  inputSetBehavior(3, AM_ENV_TYPE_ALPHANUM, AM_INPUT_EDIT_TYPE_NEXT, 0);
-  inputSetBehavior(3, AM_ENV_TYPE_NUMERIC, AM_INPUT_EDIT_TYPE_NEXT, 0);
-  inputSetBehavior(3, AM_ENV_RANGE, AM_INPUT_NULL, 0);
+  inputSetAction(3, AM_ENV_NAV, AM_INPUT_NULL);
+  inputSetAction(3, AM_ENV_TYPE_ALPHANUM, AM_INPUT_EDIT_TYPE_NEXT);
+  inputSetAction(3, AM_ENV_TYPE_NUMERIC, AM_INPUT_EDIT_TYPE_NEXT);
+  inputSetAction(3, AM_ENV_RANGE, AM_INPUT_NULL);
   
   /*select*/
   inputSetId(4, 101);
-  inputSetBehavior(4, AM_ENV_NAV, AM_INPUT_NAV_ENTER, 0);
-  inputSetBehavior(4, AM_ENV_TYPE_ALPHANUM, AM_INPUT_EDIT_CONFIRM, 0);
-  inputSetBehavior(4, AM_ENV_TYPE_NUMERIC, AM_INPUT_EDIT_CONFIRM, 0);
-  inputSetBehavior(4, AM_ENV_RANGE, AM_INPUT_RANGE_CONFIRM, 0);
+  inputSetAction(4, AM_ENV_NAV, AM_INPUT_NAV_ENTER);
+  inputSetAction(4, AM_ENV_TYPE_ALPHANUM, AM_INPUT_EDIT_CONFIRM);
+  inputSetAction(4, AM_ENV_TYPE_NUMERIC, AM_INPUT_EDIT_CONFIRM);
+  inputSetAction(4, AM_ENV_RANGE, AM_INPUT_RANGE_CONFIRM);
 
   navSetTotalItems(66);
 }

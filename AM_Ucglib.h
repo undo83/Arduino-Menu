@@ -91,3 +91,37 @@ void Arduino_Menu::outputPrintItemToUcglib(String title, bool selected, bool act
     
   ucg.setPrintPos(10, UCG_LINE_HEIGHT * (_line + 1));
 }
+/*********************************************************************************************************
+** outputPrintItemToOledSSD1306(String title, bool selected, bool active)
+** Description:             Print item to OLED SSD 1306
+*********************************************************************************************************/  
+void Arduino_Menu::outputPrintTitleToUcglib(String title){
+  
+  ucg.print(title);
+  /*  
+  if(active) {
+    ucg.setColor(0, 255, 255, 255);
+    ucg.drawBox(0,UCG_LINE_HEIGHT * (_line -1 )+2,160, UCG_LINE_HEIGHT);
+    
+    
+    ucg.setColor(0,0, 0, 0);
+    ucg.setColor(1,255, 255, 255);
+    //outputPrintToUcglib(">");
+  }else{
+    ucg.setColor(0, 0, 0, 0);
+    ucg.drawBox(0,UCG_LINE_HEIGHT * (_line -1 )+2,160, UCG_LINE_HEIGHT);
+    ucg.setColor(0,255, 255, 255);
+    ucg.setColor(1,0, 0, 0);
+    
+  }
+  ucg.print(title);
+  //Serial.println(UCG_LINE_HEIGHT * (_line -1 )+2);
+  if(selected) ucg.print("*");
+    
+    ucg.setColor(0, 255, 255, 255);  
+    ucg.setColor(1, 0, 0,0);
+    //ucg.setColor(255, 255, 255);
+    //ucg.setColor(1, 255, 0,0);*/
+    
+  ucg.setPrintPos(10, UCG_LINE_HEIGHT * (_line + 1));
+}

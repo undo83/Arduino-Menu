@@ -62,3 +62,15 @@ void Arduino_Menu::outputPrintItemToLiquidCrystal(String title, bool selected, b
   if(line) 
     lcd.setCursor(0,_line);
 }
+
+/*********************************************************************************************************
+** outputPrintItemToLiquidCrystal(String title)
+** Description:             Print Title to LiquidCrystal
+*********************************************************************************************************/  
+void Arduino_Menu::outputPrintTitleToLiquidCrystal(String title){
+  //Liquid is too small and we don't print a title
+  //lcd.print(title);    
+  
+  //if(line) 
+  //  lcd.setCursor(0,_line);
+}

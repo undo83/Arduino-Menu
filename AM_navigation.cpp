@@ -73,8 +73,8 @@
     
     navParseTitle(navGetItem(_current_menu_id).title);
 
-    outputPrintItem(_output_buffer, false, false, true);
-
+    outputPrintTitle(_output_buffer);
+/*
     char ch[AM_MENU_WIDTH];
     
     for(uint8_t i=0;i<AM_MENU_WIDTH;i++)
@@ -82,7 +82,7 @@
     ch[AM_MENU_WIDTH] = '\0';
     
     outputPrintItem(ch, false, false, true);
-      
+*/    
   }
 
   /*********************************************************************************************************
@@ -165,5 +165,8 @@
         _current_row++;
       }
     }
+    if(_current_row < AM_MENU_LINES)
+      for(uint8_t i = _current_row; i<=AM_MENU_LINES;i++)
+        outputPrintItem("", false, false, true);
     
   }

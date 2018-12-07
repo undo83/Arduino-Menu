@@ -40,8 +40,10 @@
 
     navShowTitle();
     
-    percent = range.v * (AM_MENU_WIDTH-3)/(range.M-range.m);
     
+
+    outputPrintProgress(range.v, range.M-range.m);
+    /*
     outputPrintItem(String(range.v), false, false, true);
 
     char ch[AM_MENU_WIDTH];
@@ -57,5 +59,5 @@
     }
     ch[AM_MENU_WIDTH-2] = ']';
     ch[AM_MENU_WIDTH-1] = '\0';
-    outputPrintItem(ch, false, false, true);
+    outputPrintItem(ch, false, false, true);*/
   }

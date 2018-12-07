@@ -94,3 +94,74 @@
 
     if(line) _line++;
   }
+
+
+  /*********************************************************************************************************
+  ** outputPrintTitle(String title)
+  ** Description:             Prints the title
+  *********************************************************************************************************/
+  void Arduino_Menu::outputPrintTitle(String title){
+    
+    #if defined AM_PLUGINS_SERIAL
+      outputPrintTitleToSerial(title);
+    #endif
+    
+    #if defined AM_PLUGINS_LIQUIDCRYSTAL
+      outputPrintTitleToLiquidCrystal(title);
+    #endif
+  
+    #if defined AM_PLUGINS_OLED_SSD1306
+      outputPrintTitleToOledSSD1306(title);
+    #endif
+  
+    #if defined AM_PLUGINS_UCGLIB
+      outputPrintTitleToUcglib(title);
+    #endif
+  
+    #if defined AM_PLUGINS_TFT
+      outputPrintTitleToTFT(title);
+    #endif
+
+    _line++;
+  }
+  /*********************************************************************************************************
+  ** outputPrintProgress(String title)
+  ** Description:             Prints the title
+  *********************************************************************************************************/
+  void Arduino_Menu::outputPrintProgress(float value, float max){
+    
+    #if defined AM_PLUGINS_SERIAL
+      //outputPrintTitleToSerial(float value, float max);
+    #endif
+    
+    #if defined AM_PLUGINS_LIQUIDCRYSTAL
+      //outputPrintTitleToLiquidCrystal(float value, float max);
+    #endif
+  
+    #if defined AM_PLUGINS_OLED_SSD1306
+      //outputPrintTitleToOledSSD1306(float value, float max);
+    #endif
+  
+    #if defined AM_PLUGINS_UCGLIB
+      //outputPrintTitleToUcglib(float value, float max);
+    #endif
+  
+    #if defined AM_PLUGINS_TFT
+      outputPrintProgressToTFT(value, max);
+    #endif
+
+    _line++;
+  }
+
+  /*********************************************************************************************************
+  ** outputClear(String title)
+  ** Description:             Prints the title
+  *********************************************************************************************************/
+  void Arduino_Menu::outputClear(){
+    
+  
+    #if defined AM_PLUGINS_TFT
+      outputClearToTFT();
+    #endif
+  }
+  

@@ -18,7 +18,6 @@ void setup() {
     
   //finish output
   menu.outputFinish();
-
 }
 
 void loop() {
@@ -29,5 +28,5 @@ void loop() {
   
   
 
-  delay(200);
+  delay(100);
 }

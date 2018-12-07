@@ -36,15 +36,15 @@
   }
   
   /*********************************************************************************************************
-  ** inputSetBehavior()
+  ** inputSetAction()
   ** Description:             Each input can perform various actions based on the environment used in. In
   *                           type environments the input follows a sequence of letters or numbers to make
   *                           the user type various characters. When we define our inputs we set the
   *                           behavior for each of them.
   *********************************************************************************************************/
-  void Arduino_Menu::inputSetBehavior(uint8_t index, uint8_t env, uint8_t action, uint8_t sequence){      
-    _inputs[index].beh[env].action = action;
-    _inputs[index].beh[env].sequence = sequence;
+  void Arduino_Menu::inputSetAction(uint8_t index, uint8_t env, uint8_t action){      
+    _inputs[index].action[env] = action;
+    
   }
   
   /*********************************************************************************************************
@@ -52,12 +52,14 @@
   ** Description:             Return the input based on its id
   *********************************************************************************************************/
   Input Arduino_Menu::inputGet(uint8_t id){
+    if(id==0) return Input {0,{0,0,0,0}};
+    
     for(uint8_t i = 0; i< sizeof _inputs / sizeof _inputs[0]; i++)
       if(_inputs[i].id == id)
         return _inputs[i];
 
-    Input temp;
-    return temp;    
+    
+    return Input {0,{0,0,0,0}};
   }
 
   
